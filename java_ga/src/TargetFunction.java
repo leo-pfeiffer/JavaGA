@@ -2,7 +2,6 @@
 public abstract class TargetFunction {
 
     private int dimension;
-    private double value = 0.0d;
 
     public TargetFunction(int dimension) {
         this.dimension = dimension;
@@ -12,9 +11,7 @@ public abstract class TargetFunction {
         return this.dimension;
     }
 
-    public double evaluate(Chromosome chromosome) {
-        return this.value;
-    }
+    public abstract double evaluate(Chromosome chromosome);
 
 
 }
