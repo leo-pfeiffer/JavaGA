@@ -1,7 +1,3 @@
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 /** Run the algorithm. */
 public class AlgorithmMain {
     public static void main(String[] args) {
@@ -20,12 +16,7 @@ public class AlgorithmMain {
 
         Chromosome[][] generations = ga.getGenerations();
 
-        for (int i = 0; i < generations.length; i++) {
-            List<Chromosome> gen = Arrays.asList(generations[i].clone());
-            Collections.sort(gen);
-            double[] genes = gen.get(0).getGenes();
-            double fitness = gen.get(0).getFitness();
-            System.out.println("(" + genes[0] + ", " + genes[1] + ") -> " + fitness);
-        }
+        // Process the output...
+        OutputProcessor op = new OutputProcessor(generations);
     }
 }
