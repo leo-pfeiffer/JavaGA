@@ -2,6 +2,7 @@ package cliDelegate;
 
 import model.Chromosome;
 import model.GeneticAlgorithm;
+import model.Multimodal;
 import model.OutputProcessor;
 import model.TargetFunction;
 
@@ -42,7 +43,7 @@ public class CliGA {
         setup();
 
         // Run GA
-        System.out.println("Running GA... ----\n");
+        System.out.println("Running GA...\n");
         GeneticAlgorithm ga = new GeneticAlgorithm(target, cr, mr, mx, popSize, maxGen, startingValues, searchSpace);
         Chromosome[][] generations = ga.getGenerations();
         System.out.println("------------------\n");
@@ -52,15 +53,15 @@ public class CliGA {
 
         switch (outputProcessingPrompt()) {
             case 1 -> op.printGenerations();
-            case 2 -> op.fitnessToJson();
+            case 2 -> op.saveFitnessToJson();
             case 3 -> System.exit(0);
             default -> {
-                System.err.println("Invalid input. Selected 1.");
+                System.out.println("Invalid input. Selected 1.");
                 op.printGenerations();
             }
         }
 
-        System.out.println("Good bye");
+        System.out.println("\nGood bye!");
         System.exit(0);
     }
 
@@ -68,11 +69,14 @@ public class CliGA {
 
         try {
             // Target function
-            System.out.print("State your target function: ");
+            System.out.print("State your target function (default: multimodal): ");
             Scanner s = new Scanner(System.in);
 
-            String targetName = s.next();
-
+            String targetName = s.nextLine();
+            if (targetName.equals("")) {
+                targetName = "multimodal";
+                System.out.println("multimodal");
+            }
             try {
                 target = registeredTargets.get(targetName);
             } catch(Exception e) {
@@ -81,9 +85,16 @@ public class CliGA {
 
             // Starting values
             int dimensions = target.getDimension();
-            System.out.print("State your starting values (" + dimensions + " dimensions, comma separated): ");
+            System.out.print("State your starting values (" + dimensions + " dimensions, comma separated. default: 0,0,...): ");
 
-            List<String> startingValuesRaw = Arrays.asList(s.next().split(","));
+            String startingValuesIn = s.nextLine();
+
+            if (startingValuesIn.equals("")) {
+                startingValuesIn = "0,".repeat(dimensions);
+                startingValuesIn = startingValuesIn.substring(0, startingValuesIn.length()-1);
+                System.out.println(startingValuesIn);
+            }
+            List<String> startingValuesRaw = Arrays.asList(startingValuesIn.split(","));
 
             if (startingValuesRaw.toArray().length != dimensions) {
                 throw new IllegalArgumentException("Incorrect number of dimensions.\n" +
@@ -96,8 +107,17 @@ public class CliGA {
             }
 
             // Search space
-            System.out.print("State your search space (" + dimensions + " dimensions, comma separated): ");
-            List<String> searchSpaceRaw = Arrays.asList(s.next().split(","));
+            System.out.print("State your search space (" + dimensions + " dimensions, comma separated. default: 1,1,...): ");
+
+            String searchSpaceIn = s.nextLine();
+
+            if (searchSpaceIn.equals("")) {
+                searchSpaceIn = "1,".repeat(dimensions);
+                searchSpaceIn = searchSpaceIn.substring(0, searchSpaceIn.length()-1);
+                System.out.println(searchSpaceIn);
+            }
+
+            List<String> searchSpaceRaw = Arrays.asList(searchSpaceIn.split(","));
             if (searchSpaceRaw.toArray().length != dimensions) {
                 throw new IllegalArgumentException("Incorrect number of dimensions.\n" +
                         "Expected " + dimensions + " but got " + searchSpaceRaw.toArray().length);
@@ -109,37 +129,64 @@ public class CliGA {
             }
 
             // mutation rate
-            System.out.print("Mutation rate mr: ");
-            mr = Double.parseDouble(s.next());
+            System.out.print("Mutation rate mr (default: 0.8): ");
+
+            String mrIn = s.nextLine();
+            if (mrIn.equals("")) {
+                mrIn = "0.8";
+                System.out.println(mrIn);
+            }
+
+            mr = Double.parseDouble(mrIn);
             if (mr <= 0 || mr >= 1) {
                 throw new IllegalArgumentException("mr must be between 0 and 1.");
             }
 
             // crossover rate
-            System.out.print("Crossover rate cr: ");
-            cr = Double.parseDouble(s.next());
+            System.out.print("Crossover rate cr (default: 0.7): ");
+            String crIn = s.nextLine();
+            if (crIn.equals("")) {
+                crIn = "0.7";
+                System.out.println(crIn);
+            }
+            cr = Double.parseDouble(crIn);
             if (cr <= 0 || cr >= 1) {
                 throw new IllegalArgumentException("cr must be between 0 and 1.");
             }
 
-
             // mutation parameter
-            System.out.print("Mutation parameter mx: ");
-            mx = Double.parseDouble(s.next());
+
+            System.out.print("Mutation parameter mx (default: 0.2): ");
+            String mxIn = s.nextLine();
+            if (mxIn.equals("")) {
+                mxIn = "0.2";
+                System.out.println(mxIn);
+            }
+            mx = Double.parseDouble(mxIn);
             if (mx <= 0 || mx >= 1) {
                 throw new IllegalArgumentException("mx must be between 0 and 1.");
             }
 
             // population size
-            System.out.print("Population size popSize: ");
-            popSize = Integer.parseInt(s.next());
+            System.out.print("Population size popSize (default: 10): ");
+            String popSizeIn = s.nextLine();
+            if (popSizeIn.equals("")) {
+                popSizeIn = "10";
+                System.out.println(popSizeIn);
+            }
+            popSize = Integer.parseInt(popSizeIn);
             if (popSize < 1) {
                 throw new IllegalArgumentException("popSize must be greater or equal than 1.");
             }
 
             // maximum generation
-            System.out.print("Maximum generation maxGen: ");
-            maxGen = Integer.parseInt(s.next());
+            System.out.print("Maximum generation maxGen (default: 100): ");
+            String maxGenIn = s.nextLine();
+            if (maxGenIn.equals("")) {
+                maxGenIn = "100";
+                System.out.println(maxGenIn);
+            }
+            maxGen = Integer.parseInt(maxGenIn);
             if (maxGen < 1) {
                 throw new IllegalArgumentException("maxGen must be greater or equal than 1.");
             }
@@ -157,7 +204,7 @@ public class CliGA {
                 "How to process output? Enter the number of your selection.\n" +
                 "1: Print each generations parameters and fitness.\n" +
                 "2: Export to JSON.\n" +
-                "3: Quit.\n";
+                "3: Quit.";
 
         System.out.println(optionText);
         Scanner s = new Scanner(System.in);
