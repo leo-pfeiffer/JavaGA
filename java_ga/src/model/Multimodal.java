@@ -1,7 +1,9 @@
+package model;
+
 public class Multimodal extends TargetFunction {
 
     public Multimodal() {
-        super(2);
+        super(2, "multimodal");
     }
 
     @Override

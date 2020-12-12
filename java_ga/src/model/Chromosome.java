@@ -1,3 +1,5 @@
+package model;
+
 /** Implements a single chromosome for the GA. */
 public class Chromosome implements Comparable<Chromosome> {
 

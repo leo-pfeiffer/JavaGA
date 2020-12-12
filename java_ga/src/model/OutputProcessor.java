@@ -1,3 +1,5 @@
+package model;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -5,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/** OutputProcessor handles the output produced by the Genetic Algorithm. */
+/** model.OutputProcessor handles the output produced by the Genetic Algorithm. */
 public class OutputProcessor {
 
     Chromosome[][] generations;
@@ -30,5 +32,9 @@ public class OutputProcessor {
 
         Gson gson = new Gson();
         return gson.toJson(fitnessValues);
+    }
+
+    public void printGenerations() {
+
     }
 }
