@@ -53,7 +53,7 @@ public class CliGA {
 
         switch (outputProcessingPrompt()) {
             case 1 -> op.printGenerations();
-            case 2 -> op.saveFitnessToJson();
+            case 2 -> op.pickSaveMethodAndSave();
             case 3 -> System.exit(0);
             default -> {
                 System.out.println("Invalid input. Selected 1.");

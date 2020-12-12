@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 /** model.OutputProcessor handles the output produced by the Genetic Algorithm. */
 public class OutputProcessor {
@@ -35,7 +36,7 @@ public class OutputProcessor {
         return fitnessValues;
     }
 
-    public void saveFitnessToJson() {
+    public String filePathFromSaveDialog() {
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save");
@@ -45,18 +46,48 @@ public class OutputProcessor {
         // If user has entered a name and clicked OK, write the JSON to a file
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File saveFile = fileChooser.getSelectedFile();
+            return saveFile.toString();
+        } else {
+            return "";
+        }
+    }
 
-            Gson gson = new Gson();
-            try {
-                List<Double> fitnessValues = fitnessValues();
-                FileWriter writer = new FileWriter(saveFile.toString());
-                gson.toJson(fitnessValues, writer);
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                System.out.println("Could not write to the specified file path.");
+    public void saveFitnessToFile(String saveFile) {
+        Gson gson = new Gson();
+        try {
+            List<Double> fitnessValues = fitnessValues();
+            FileWriter writer = new FileWriter(saveFile);
+            gson.toJson(fitnessValues, writer);
+            writer.flush();
+            writer.close();
+            System.out.println("Saved file: " + saveFile);
+        } catch (IOException e) {
+            System.out.println("Could not write to the specified file path.");
+        }
+    }
+
+    public void pickSaveMethodAndSave() {
+        System.out.print("Save file via dialog (1) or enter path manually (2)? ");
+        Scanner s = new Scanner(System.in);
+
+        switch (s.nextInt()) {
+            case 1 -> {
+                String filepath = filePathFromSaveDialog();
+                saveFitnessToFile(filepath);
+            }
+            case 2 -> {
+                System.out.print("Enter file path and name: ");
+                String filepath = s.next();
+                saveFitnessToFile(filepath);
+            }
+            default -> {
+                System.out.println("Invalid input.");
+                System.exit(1);
             }
         }
+
+
+
     }
 
     public void printGenerations() {
