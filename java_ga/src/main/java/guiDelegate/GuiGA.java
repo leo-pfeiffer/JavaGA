@@ -154,9 +154,13 @@ public class GuiGA implements PropertyChangeListener {
 
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        if(event.getSource() == ga && event.getPropertyName().equals("random_numbers")) {
+        if(event.getSource() == ga && event.getPropertyName().equals("run_complete")) {
             // Tell the SwingUtilities thread to update the text in the GUI components.
-            SwingUtilities.invokeLater(() -> outputField.setText((Arrays.toString((int[]) event.getNewValue()))));
+            SwingUtilities.invokeLater(() -> {
+                Chromosome[][] generations = (Chromosome[][]) event.getNewValue();
+                OutputProcessor op = new OutputProcessor(generations);
+                outputField.setText(Arrays.toString(op.fitnessValues().toArray()));
+            });
         }
     }
 
@@ -219,10 +223,6 @@ public class GuiGA implements PropertyChangeListener {
 
             // run algorithm
             ga.runAlgorithm();
-
-            Chromosome[][] generations = ga.getGenerations();
-            OutputProcessor op = new OutputProcessor(generations);
-            op.printGenerations();
 
 
         } catch (Exception exc) {

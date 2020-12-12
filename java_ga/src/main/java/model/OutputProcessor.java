@@ -85,9 +85,6 @@ public class OutputProcessor {
                 System.exit(1);
             }
         }
-
-
-
     }
 
     public void printGenerations() {

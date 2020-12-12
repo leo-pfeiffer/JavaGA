@@ -132,6 +132,7 @@ public class GeneticAlgorithm {
             this.survival(gen);
         }
         System.out.print("" + maxGen + " / " + maxGen + "\n");
+        notifier.firePropertyChange("run_complete", null, this.generations);
     }
 
     private void crossover(int gen) {
