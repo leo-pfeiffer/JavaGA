@@ -21,8 +21,9 @@ public class GuiGA implements PropertyChangeListener {
     private HashMap<String, TargetFunction> registeredTargets;
     private GeneticAlgorithm ga;
 
-    private static final int FRAME_HEIGHT = 1200;
-    private static final int FRAME_WIDTH = 400;
+    private static final int FRAME_HEIGHT = 600;
+    private static final int FRAME_WIDTH = 1200;
+    private static final int TOOLBAR_WIDTH = 200;
     private static final int TEXT_HEIGHT = 10;
     private static final int TEXT_WIDTH = 10;
 
@@ -51,7 +52,7 @@ public class GuiGA implements PropertyChangeListener {
 
         mainFrame = new JFrame("GA");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(FRAME_HEIGHT, FRAME_WIDTH);
+        mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setVisible(true);
 
         toolbar = new JToolBar(JToolBar.VERTICAL);
@@ -122,14 +123,10 @@ public class GuiGA implements PropertyChangeListener {
             });
         }
 
-        targetSelector.addActionListener(event -> {
-            setArrayDefaultTextFromTargetFunction();
-        });
+        targetSelector.addActionListener(event -> setArrayDefaultTextFromTargetFunction());
 
         JButton runAlgorithmButtom = new JButton("Run Algorithm");
-        runAlgorithmButtom.addActionListener(e -> {
-             submitInput();
-        });
+        runAlgorithmButtom.addActionListener(e -> submitInput());
 
         // add buttons, label, and textfield to the toolbar
         toolbar.add(tLabel);
@@ -150,6 +147,7 @@ public class GuiGA implements PropertyChangeListener {
         toolbar.add(maxGenField);
 
         toolbar.add(runAlgorithmButtom);
+        toolbar.setPreferredSize(new Dimension(TOOLBAR_WIDTH, FRAME_HEIGHT));
         // add toolbar to north of main frame
         mainFrame.add(toolbar, BorderLayout.WEST);
     }
