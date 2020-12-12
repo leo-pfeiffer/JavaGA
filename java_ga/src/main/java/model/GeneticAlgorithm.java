@@ -1,5 +1,7 @@
 package model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,14 +33,25 @@ public class GeneticAlgorithm {
     /** Starting values. */
     double[] startingValues;
 
+    /** Search space. */
+    double[] searchSpace;
+
     /** Nested ArrayList of the populations of each generation. */
     Chromosome[][] generations;
 
     /** Intermediate population. */
     Chromosome[] intermediatePop;
 
-    public GeneticAlgorithm(TargetFunction target, double cr, double mr, double mx, int popSize,
-                            int maxGen, double [] startingValues, double[] searchSpace) {
+    /* The property change support object to use when notifying listeners of the model. */
+    private PropertyChangeSupport notifier;
+
+    public GeneticAlgorithm() {
+        notifier = new PropertyChangeSupport(this);
+    }
+
+
+    public void setAttributes(TargetFunction target, double cr, double mr, double mx, int popSize,
+                              int maxGen, double [] startingValues, double[] searchSpace) {
         this.target = target;
         this.cr = cr;
         this.mr = mr;
@@ -46,19 +59,39 @@ public class GeneticAlgorithm {
         this.popSize = popSize;
         this.startingValues = startingValues;
         this.maxGen = maxGen;
+        this.searchSpace = searchSpace;
+    }
 
-        // initialise the generations and intermediate population
-        generations = new Chromosome[maxGen][popSize];
-        this.intermediatePop = new Chromosome[this.popSize];
+    public void setTarget(TargetFunction target) {
+        this.target = target;
+    }
 
-        // set the parent population
-        for (int i = 0; i < popSize; i++) {
-            Chromosome chromosome = new Chromosome(this.target, startingValues, searchSpace);
-            chromosome.evaluateFitness();
-            generations[0][i] = chromosome;
-        }
+    public void setCr(double cr) {
+        this.cr = cr;
+    }
 
-        this.runAlgorithm();
+    public void setMr(double mr) {
+        this.mr = mr;
+    }
+
+    public void setMx(double mx) {
+        this.mx = mx;
+    }
+
+    public void setPopSize(int popSize) {
+        this.popSize = popSize;
+    }
+
+    public void setStartingValues(double[] startingValues){
+        this.startingValues = startingValues;
+    }
+
+    public void setSearchSpace (double[] searchSpace){
+        this.searchSpace = searchSpace;
+    }
+
+    public void setMaxGen(int maxGen) {
+        this.maxGen = maxGen;
     }
 
     public Chromosome[][] getGenerations() {
@@ -79,7 +112,19 @@ public class GeneticAlgorithm {
         return lastGen.get(0);
     }
 
-    private void runAlgorithm() {
+    public void runAlgorithm() {
+
+        // initialise the generations and intermediate population
+        generations = new Chromosome[maxGen][popSize];
+        this.intermediatePop = new Chromosome[this.popSize];
+
+        // set the parent population
+        for (int i = 0; i < popSize; i++) {
+            Chromosome chromosome = new Chromosome(this.target, this.startingValues, this.searchSpace);
+            chromosome.evaluateFitness();
+            generations[0][i] = chromosome;
+        }
+
         for (int gen = 0; gen < maxGen; gen++) {
             System.out.print("" + gen + " / " + maxGen + "\r");
             this.crossover(gen);
@@ -158,5 +203,13 @@ public class GeneticAlgorithm {
         for (int i = 0; i < this.popSize; i++) {
             this.generations[gen+1][i] = pool.get(i);
         }
+    }
+
+    /**
+     * Utility method to add an observer using this object's private (encapsulated) property change support object.
+     * @param listener the listener to add
+     */
+    public void addObserver(PropertyChangeListener listener) {
+        notifier.addPropertyChangeListener(listener);
     }
 }

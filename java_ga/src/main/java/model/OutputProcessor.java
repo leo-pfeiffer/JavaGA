@@ -2,7 +2,7 @@ package model;
 
 import com.google.gson.Gson;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

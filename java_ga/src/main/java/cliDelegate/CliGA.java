@@ -44,7 +44,8 @@ public class CliGA {
 
         // Run GA
         System.out.println("Running GA...\n");
-        GeneticAlgorithm ga = new GeneticAlgorithm(target, cr, mr, mx, popSize, maxGen, startingValues, searchSpace);
+        GeneticAlgorithm ga = new GeneticAlgorithm();
+        ga.setAttributes(target, cr, mr, mx, popSize, maxGen, startingValues, searchSpace);
         Chromosome[][] generations = ga.getGenerations();
         System.out.println("------------------\n");
 

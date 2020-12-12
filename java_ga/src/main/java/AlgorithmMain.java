@@ -43,7 +43,6 @@ public class AlgorithmMain {
 
         if (delegate.equals("gui")) {
             GuiGA guiGA = new GuiGA(registeredTargets);
-            guiGA.run();
         }
 
         else {
