@@ -3,7 +3,7 @@
 A simple Java implementation for Genetic Algorithms with CLI and GUI.
 
 ### Get started
-- Run the GA via the AlgorithmMain class: `java AlgorithmMain [--cli | --gui]`
+- Run the GA via the AlgorithmMain class: `java AlgorithmMain [--cli | --gui]`. The default is `--gui`.
 - Use `--cli` for the commmand line version
 - Pick `--gui` for the GUI version
 
