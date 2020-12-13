@@ -23,16 +23,15 @@ public class GuiGA implements PropertyChangeListener {
 
     private static final int FRAME_HEIGHT = 600;
     private static final int FRAME_WIDTH = 1200;
-    private static final int TOOLBAR_WIDTH = 200;
-    private static final int TEXT_HEIGHT = 10;
+    private static final int TOOLBAR_WIDTH = 300;
+    private static final int GRAPH_WIDTH = FRAME_WIDTH - TOOLBAR_WIDTH;
     private static final int TEXT_WIDTH = 10;
 
     private JFrame mainFrame;
 
     private JToolBar toolbar;
     private JComboBox<String> targetSelector;
-    private JScrollPane outputPane;
-    private JTextArea outputField;
+    private GraphPanel graphPanel;
 
     private JTextField crField;
     private JTextField mrField;
@@ -54,6 +53,7 @@ public class GuiGA implements PropertyChangeListener {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setVisible(true);
+        mainFrame.setLocationRelativeTo(null);
 
         toolbar = new JToolBar(JToolBar.VERTICAL);
 
@@ -69,10 +69,11 @@ public class GuiGA implements PropertyChangeListener {
         toolbarComponents.add(searchSpaceField = new JTextField(TEXT_WIDTH));
         toolbarComponents.add(maxGenField = new JTextField("100", TEXT_WIDTH));
 
-        outputField = new JTextArea(TEXT_WIDTH, TEXT_HEIGHT);
-        outputField.setEditable(false);
+        List<Double> startGraphValues = new ArrayList<>();
+        startGraphValues.add(0d);
+        graphPanel = new GraphPanel(startGraphValues);
+        graphPanel.setPreferredSize(new Dimension(GRAPH_WIDTH, FRAME_HEIGHT));
 
-        outputPane = new JScrollPane(outputField);
         setupComponents();
 
         this.ga.addObserver(this);
@@ -81,10 +82,8 @@ public class GuiGA implements PropertyChangeListener {
 
     private void setupComponents(){
         setupToolbar();
-        mainFrame.add(outputPane, BorderLayout.CENTER);
-        mainFrame.setSize (FRAME_WIDTH, FRAME_HEIGHT);
-        mainFrame.setVisible(true);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.add(graphPanel, BorderLayout.CENTER);
+        mainFrame.pack();
     }
 
     private void setupToolbar(){
@@ -159,7 +158,7 @@ public class GuiGA implements PropertyChangeListener {
             SwingUtilities.invokeLater(() -> {
                 Chromosome[][] generations = (Chromosome[][]) event.getNewValue();
                 OutputProcessor op = new OutputProcessor(generations);
-                outputField.setText(Arrays.toString(op.fitnessValues().toArray()));
+                displayGraph(op.fitnessValues());
             });
         }
     }
@@ -228,6 +227,10 @@ public class GuiGA implements PropertyChangeListener {
         } catch (Exception exc) {
             JOptionPane.showMessageDialog(mainFrame, "Ooops, your arguments were faulty!");
         }
+    }
+
+    public void displayGraph(List<Double> fitnessValues) {
+        graphPanel.setScores(fitnessValues);
     }
 
     public String getDefaultStartingValuesString(int dimensions) {
