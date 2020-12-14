@@ -203,7 +203,7 @@ public class CliGA {
     private int outputProcessingPrompt() {
         String optionText = "" +
                 "How to process output? Enter the number of your selection.\n" +
-                "1: Print each generations parameters and fitness.\n" +
+                "1: Print each generations parameters and fitness. \n" +
                 "2: Export to JSON.\n" +
                 "3: Quit.";
 

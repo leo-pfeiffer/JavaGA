@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.swing.JFileChooser;
 import java.io.File;
@@ -52,12 +53,11 @@ public class OutputProcessor {
         }
     }
 
-    public void saveFitnessToFile(String saveFile) {
-        Gson gson = new Gson();
+    public void saveGenerationsToFile(String saveFile) {
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         try {
-            List<Double> fitnessValues = fitnessValues();
             FileWriter writer = new FileWriter(saveFile);
-            gson.toJson(fitnessValues, writer);
+            gson.toJson(generations, writer);
             writer.flush();
             writer.close();
             System.out.println("Saved file: " + saveFile);
@@ -73,12 +73,12 @@ public class OutputProcessor {
         switch (s.nextInt()) {
             case 1 -> {
                 String filepath = filePathFromSaveDialog();
-                saveFitnessToFile(filepath);
+                saveGenerationsToFile(filepath);
             }
             case 2 -> {
                 System.out.print("Enter file path and name: ");
                 String filepath = s.next();
-                saveFitnessToFile(filepath);
+                saveGenerationsToFile(filepath);
             }
             default -> {
                 System.out.println("Invalid input.");

@@ -48,8 +48,6 @@ public class GuiGA implements PropertyChangeListener {
 
     /** Action to save the drawing. */
     Action saveAction;
-    /** Action open a file. */
-    Action openAction;
     /** Action to open the help dialog. */
     Action helpAction;
 
@@ -173,12 +171,10 @@ public class GuiGA implements PropertyChangeListener {
         JMenu edit = new JMenu ("Edit");
 
         // Create the items
-        JMenuItem open = new JMenuItem ("Open");
-        JMenuItem save = new JMenuItem ("Save");
+        JMenuItem save = new JMenuItem ("Export to JSON");
         JMenuItem help = new JMenuItem ("Help");
 
         // Add items to the menu
-        file.add (open);
         file.add (save);
         file.add (help);
 
@@ -187,7 +183,6 @@ public class GuiGA implements PropertyChangeListener {
         menuBar.add(edit);
 
         // Add action listeners and actions to the items
-        addActionListenerToMenuItem(open, openAction);
         addActionListenerToMenuItem(save, saveAction);
         addActionListenerToMenuItem(help, helpAction);
 
@@ -197,30 +192,6 @@ public class GuiGA implements PropertyChangeListener {
 
     /** Create all actions. */
     public void createActions() {
-
-        // Opening a file
-        openAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                // Open a file chooser dialog
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Open");
-
-                int returnVal = fileChooser.showOpenDialog(fileChooser);
-
-                // If user chooses file and clicks OK, read the file
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
-                    // todo read from file
-                }
-
-                JOptionPane.showMessageDialog(mainFrame, "Not implemented yet.", "Info",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                mainFrame.repaint();
-            }
-        };
 
         // Save the drawing
         saveAction = new AbstractAction() {
@@ -251,9 +222,7 @@ public class GuiGA implements PropertyChangeListener {
                         }
 
                         OutputProcessor op = new OutputProcessor(generations);
-                        // todo don't just save the fitness but everything
-                        op.saveFitnessToFile(saveFile.toString());
-
+                        op.saveGenerationsToFile(saveFile.toString());
                     }
                 }
             }

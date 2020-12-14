@@ -1,15 +1,16 @@
 package model;
 
+import com.google.gson.annotations.Expose;
+
 /** Implements a single chromosome for the GA. */
 public class Chromosome implements Comparable<Chromosome> {
 
     /** Genes of the chromosome */
+    @Expose
     private double[] genes;
 
-    /** Length of the chromosome */
-    private final int LENGTH;
-
     /** Fitness value. */
+    @Expose
     private double fitness;
 
     private boolean evaluated;
@@ -23,7 +24,6 @@ public class Chromosome implements Comparable<Chromosome> {
 
     public Chromosome(TargetFunction target, double[] genes, double[] searchSpace) {
         this.target = target;
-        this.LENGTH = target.getDimension();
         if (searchSpace == null) {
             this.genes = genes;
         } else {
