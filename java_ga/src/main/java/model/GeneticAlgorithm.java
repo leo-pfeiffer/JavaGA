@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import model.Target.TargetFunction;
 import org.apache.commons.lang3.ArrayUtils;
 
 
@@ -136,37 +138,43 @@ public class GeneticAlgorithm {
     }
 
     private void crossover(int gen) {
+
         Chromosome[] pool = generations[gen];
 
-        // Shuffle chromosomes in pool
-        Random rand = new Random();
-        for (int i = 0; i < pool.length; i++) {
-            int randomIndexToSwap = rand.nextInt(pool.length);
-            Chromosome chrom = pool[randomIndexToSwap];
-            pool[randomIndexToSwap] = pool[i];
-            pool[i] = chrom;
-        }
+        // 1d functions cannot crossover
+        if (this.target.getDimension() == 1) {
+            System.arraycopy(pool, 0, this.intermediatePop, 0, pool.length);
+        } else {
+            // Shuffle chromosomes in pool
+            Random rand = new Random();
+            for (int i = 0; i < pool.length; i++) {
+                int randomIndexToSwap = rand.nextInt(pool.length);
+                Chromosome chrom = pool[randomIndexToSwap];
+                pool[randomIndexToSwap] = pool[i];
+                pool[i] = chrom;
+            }
 
-        for (int i = 0; i < Math.ceil((double) popSize / 2); i++) {
-            int cut = rand.nextInt(target.getDimension()-1) + 1;
+            for (int i = 0; i < Math.ceil((double) popSize / 2); i++) {
+                int cut = rand.nextInt(target.getDimension()-1) + 1;
 
-            // create first crossover part
-            double[] cross1Start = new double[cut];
-            System.arraycopy(pool[i*2].getGenes(), 0, cross1Start, 0, cut);
-            double[] cross1End = new double[target.getDimension()-cut];
-            System.arraycopy(pool[i*2+1].getGenes(), cut, cross1End, 0, target.getDimension()-cut);
-            double[] cross1 = ArrayUtils.addAll(cross1Start, cross1End);
+                // create first crossover part
+                double[] cross1Start = new double[cut];
+                System.arraycopy(pool[i*2].getGenes(), 0, cross1Start, 0, cut);
+                double[] cross1End = new double[target.getDimension()-cut];
+                System.arraycopy(pool[i*2+1].getGenes(), cut, cross1End, 0, target.getDimension()-cut);
+                double[] cross1 = ArrayUtils.addAll(cross1Start, cross1End);
 
-            // create second crossover part
-            double[] cross2Start = new double[cut];
-            System.arraycopy(pool[i*2+1].getGenes(), 0, cross2Start, 0, cut);
-            double[] cross2End = new double[target.getDimension()-cut];
-            System.arraycopy(pool[i*2].getGenes(), cut, cross2End, 0, target.getDimension()-cut);
-            double[] cross2 = ArrayUtils.addAll(cross2Start, cross2End);
+                // create second crossover part
+                double[] cross2Start = new double[cut];
+                System.arraycopy(pool[i*2+1].getGenes(), 0, cross2Start, 0, cut);
+                double[] cross2End = new double[target.getDimension()-cut];
+                System.arraycopy(pool[i*2].getGenes(), cut, cross2End, 0, target.getDimension()-cut);
+                double[] cross2 = ArrayUtils.addAll(cross2Start, cross2End);
 
-            // Create new Chromosomes
-            this.intermediatePop[i*2] = new Chromosome(this.target, cross1);
-            this.intermediatePop[i*2+1] = new Chromosome(this.target, cross2);
+                // Create new Chromosomes
+                this.intermediatePop[i*2] = new Chromosome(this.target, cross1);
+                this.intermediatePop[i*2+1] = new Chromosome(this.target, cross2);
+            }
         }
     }
 

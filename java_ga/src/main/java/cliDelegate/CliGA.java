@@ -2,9 +2,8 @@ package cliDelegate;
 
 import model.Chromosome;
 import model.GeneticAlgorithm;
-import model.Multimodal;
 import model.OutputProcessor;
-import model.TargetFunction;
+import model.Target.TargetFunction;
 
 import java.util.Arrays;
 import java.util.HashMap;

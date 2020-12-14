@@ -1,7 +1,8 @@
 import cliDelegate.CliGA;
 import guiDelegate.GuiGA;
-import model.Multimodal;
-import model.TargetFunction;
+import model.Target.Multimodal;
+import model.Target.Quadratic;
+import model.Target.TargetFunction;
 
 import java.util.HashMap;
 
@@ -56,6 +57,9 @@ public class AlgorithmMain {
 
         Multimodal multimodal = new Multimodal();
         registeredTargets.put(multimodal.getName(), multimodal);
+
+        Quadratic quadratic = new Quadratic();
+        registeredTargets.put(quadratic.getName(), quadratic);
 
         return registeredTargets;
     }

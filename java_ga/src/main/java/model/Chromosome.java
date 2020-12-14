@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.annotations.Expose;
+import model.Target.TargetFunction;
 
 /** Implements a single chromosome for the GA. */
 public class Chromosome implements Comparable<Chromosome> {

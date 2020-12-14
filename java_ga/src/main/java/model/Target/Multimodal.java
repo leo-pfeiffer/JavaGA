@@ -1,4 +1,6 @@
-package model;
+package model.Target;
+
+import model.Chromosome;
 
 public class Multimodal extends TargetFunction {
 

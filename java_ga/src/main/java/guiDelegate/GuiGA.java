@@ -3,7 +3,7 @@ package guiDelegate;
 import model.Chromosome;
 import model.GeneticAlgorithm;
 import model.OutputProcessor;
-import model.TargetFunction;
+import model.Target.TargetFunction;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
@@ -319,7 +319,8 @@ public class GuiGA implements PropertyChangeListener {
 
 
         } catch (Exception exc) {
-            JOptionPane.showMessageDialog(mainFrame, "Ooops, your arguments were faulty!");
+            throw new IllegalArgumentException(exc);
+            // JOptionPane.showMessageDialog(mainFrame, "Ooops, your arguments were faulty!");
         }
     }
 
