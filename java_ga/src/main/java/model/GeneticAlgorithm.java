@@ -61,6 +61,8 @@ public class GeneticAlgorithm {
         this.popSize = popSize;
         this.startingValues = startingValues;
         this.maxGen = maxGen;
+
+        // todo define searh space differently, i.e. set as fixed bounds which cannot be left by the serach
         this.searchSpace = searchSpace;
     }
 
