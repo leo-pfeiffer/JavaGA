@@ -4,13 +4,16 @@ import model.Chromosome;
 import model.GeneticAlgorithm;
 import model.OutputProcessor;
 import model.TargetFunction;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +36,8 @@ public class GuiGA implements PropertyChangeListener {
     private JComboBox<String> targetSelector;
     private GraphPanel graphPanel;
 
+    private JMenuBar menuBar;
+
     private JTextField crField;
     private JTextField mrField;
     private JTextField mxField;
@@ -40,6 +45,13 @@ public class GuiGA implements PropertyChangeListener {
     private JTextField startingValuesField;
     private JTextField searchSpaceField;
     private JTextField maxGenField;
+
+    /** Action to save the drawing. */
+    Action saveAction;
+    /** Action open a file. */
+    Action openAction;
+    /** Action to open the help dialog. */
+    Action helpAction;
 
     private ArrayList<JComponent> toolbarComponents;
 
@@ -55,7 +67,10 @@ public class GuiGA implements PropertyChangeListener {
         mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);
 
+        createActions();
+
         toolbar = new JToolBar(JToolBar.VERTICAL);
+        menuBar = new JMenuBar();
 
         String [] dataTargetSelector = registeredTargets.keySet().toArray(new String[0]);
 
@@ -82,6 +97,7 @@ public class GuiGA implements PropertyChangeListener {
 
     private void setupComponents(){
         setupToolbar();
+        setupMenus();
         mainFrame.add(graphPanel, BorderLayout.CENTER);
         mainFrame.pack();
     }
@@ -149,6 +165,115 @@ public class GuiGA implements PropertyChangeListener {
         toolbar.setPreferredSize(new Dimension(TOOLBAR_WIDTH, FRAME_HEIGHT));
         // add toolbar to north of main frame
         mainFrame.add(toolbar, BorderLayout.WEST);
+    }
+
+    private void setupMenus() {
+        // Set up file and edit menus
+        JMenu file = new JMenu ("File");
+        JMenu edit = new JMenu ("Edit");
+
+        // Create the items
+        JMenuItem open = new JMenuItem ("Open");
+        JMenuItem save = new JMenuItem ("Save");
+        JMenuItem help = new JMenuItem ("Help");
+
+        // Add items to the menu
+        file.add (open);
+        file.add (save);
+        file.add (help);
+
+        // Add menus to the overall menu
+        menuBar.add(file);
+        menuBar.add(edit);
+
+        // Add action listeners and actions to the items
+        addActionListenerToMenuItem(open, openAction);
+        addActionListenerToMenuItem(save, saveAction);
+        addActionListenerToMenuItem(help, helpAction);
+
+        // Attach the menu bar to the main frame
+        mainFrame.setJMenuBar(menuBar);
+    }
+
+    /** Create all actions. */
+    public void createActions() {
+
+        // Opening a file
+        openAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // Open a file chooser dialog
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Open");
+
+                int returnVal = fileChooser.showOpenDialog(fileChooser);
+
+                // If user chooses file and clicks OK, read the file
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    // todo read from file
+                }
+
+                JOptionPane.showMessageDialog(mainFrame, "Not implemented yet.", "Info",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                mainFrame.repaint();
+            }
+        };
+
+        // Save the drawing
+        saveAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Chromosome[][] generations = ga.getGenerations();
+
+                if (generations == null) {
+                    JOptionPane.showMessageDialog(mainFrame, "Nothing to save yet.\n" +
+                                    "Run an algorithm first.", "Info",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Open a file chooser dialog
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setDialogTitle("Save");
+
+                    int userSelection = fileChooser.showSaveDialog(fileChooser);
+
+                    // If user has entered a name and clicked OK, write the shapes to a file
+                    if (userSelection == JFileChooser.APPROVE_OPTION) {
+
+                        File saveFile = fileChooser.getSelectedFile();
+                        if (!FilenameUtils.getExtension(saveFile.getName()).equalsIgnoreCase("json")) {
+                            // remove the extension (if any) and replace it with ".json"
+                            saveFile = new File(saveFile.getParentFile(),
+                                    FilenameUtils.getBaseName(saveFile.getName())+".json");
+                        }
+
+                        OutputProcessor op = new OutputProcessor(generations);
+                        // todo don't just save the fitness but everything
+                        op.saveFitnessToFile(saveFile.toString());
+
+                    }
+                }
+            }
+        };
+
+        // Open the help dialog
+        helpAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(mainFrame, HelpText.getText(), "Help",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        };
+    }
+
+    /** Add an action listener and an action to a JMenuItem.
+     * @param item the JMenuItem.
+     * @param action the action to be attached. */
+    public void addActionListenerToMenuItem(JMenuItem item, Action action) {
+        item.addActionListener(action);
     }
 
     @Override
