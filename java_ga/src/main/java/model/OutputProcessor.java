@@ -23,7 +23,7 @@ public class OutputProcessor {
     }
 
     /** Get fitness values for each generation. */
-    public List<Double> fitnessValues() {
+    public List<Double> getFitnessValues() {
 
         List<Double> fitnessValues = new ArrayList<>();
 
@@ -35,6 +35,23 @@ public class OutputProcessor {
             fitnessValues.add(fitness);
         }
         return fitnessValues;
+    }
+
+    public Chromosome getSolutionChromosome() {
+        Chromosome[] lastGen = this.generations[this.generations.length-1].clone();
+        List<Chromosome> gen = Arrays.asList(lastGen);
+        Collections.sort(gen);
+        return gen.get(0);
+    }
+
+    public double[] getSolution() {
+        Chromosome solutionChrom = getSolutionChromosome();
+        return solutionChrom.getGenes();
+    }
+
+    public double getTargetValue() {
+        Chromosome solutionChrom = getSolutionChromosome();
+        return solutionChrom.getFitness();
     }
 
     public String filePathFromSaveDialog() {

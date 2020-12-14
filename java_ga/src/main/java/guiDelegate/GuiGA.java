@@ -14,6 +14,8 @@ import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,15 +26,21 @@ public class GuiGA implements PropertyChangeListener {
     private HashMap<String, TargetFunction> registeredTargets;
     private GeneticAlgorithm ga;
 
+    private static final int MIN_FRAME_HEIGHT = 500;
+    private static final int MIN_FRAME_WIDTH = 1000;
+
     private static final int FRAME_HEIGHT = 600;
     private static final int FRAME_WIDTH = 1200;
-    private static final int TOOLBAR_WIDTH = 300;
-    private static final int GRAPH_WIDTH = FRAME_WIDTH - TOOLBAR_WIDTH;
+    private static final int OPTIONS_BAR_WIDTH = 300;
+    private static final int OUTPUT_BAR_WIDTH = 200;
+    private static final int GRAPH_WIDTH = FRAME_WIDTH - OPTIONS_BAR_WIDTH - OPTIONS_BAR_WIDTH;
     private static final int TEXT_WIDTH = 10;
 
     private JFrame mainFrame;
 
-    private JToolBar toolbar;
+    private JPanel optionsBar;
+    private JPanel outputBar;
+
     private JComboBox<String> targetSelector;
     private GraphPanel graphPanel;
 
@@ -47,12 +55,15 @@ public class GuiGA implements PropertyChangeListener {
     private JTextField searchSpaceField;
     private JTextField maxGenField;
 
+    private JTextArea targetValueField;
+    private JTextArea solutionValueField;
+
     /** Action to save the drawing. */
     Action saveAction;
     /** Action to open the help dialog. */
     Action helpAction;
 
-    private ArrayList<JComponent> toolbarComponents;
+    private ArrayList<JComponent> optionsBarComponents;
 
     public GuiGA(HashMap<String, TargetFunction> registeredTargets){
         this.registeredTargets = registeredTargets;
@@ -61,6 +72,7 @@ public class GuiGA implements PropertyChangeListener {
         this.ga = new GeneticAlgorithm();
 
         mainFrame = new JFrame("GA");
+        mainFrame.setMinimumSize(new Dimension(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT));
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setVisible(true);
@@ -68,21 +80,23 @@ public class GuiGA implements PropertyChangeListener {
 
         createActions();
 
-        toolbar = new JToolBar(JToolBar.VERTICAL);
+        optionsBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        outputBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
         menuBar = new JMenuBar();
 
         String [] dataTargetSelector = registeredTargets.keySet().toArray(new String[0]);
 
-        toolbarComponents = new ArrayList<>();
-        toolbarComponents.add(targetSelector = new JComboBox<>(dataTargetSelector));
-        toolbarComponents.add(parameterField = new JTextField("", TEXT_WIDTH));
-        toolbarComponents.add(crField = new JTextField("0.7", TEXT_WIDTH));
-        toolbarComponents.add(mrField = new JTextField("0.8", TEXT_WIDTH));
-        toolbarComponents.add(mxField = new JTextField("0.2", TEXT_WIDTH));
-        toolbarComponents.add(popSizeField = new JTextField("10", TEXT_WIDTH));
-        toolbarComponents.add(startingValuesField = new JTextField(TEXT_WIDTH));
-        toolbarComponents.add(searchSpaceField = new JTextField(TEXT_WIDTH));
-        toolbarComponents.add(maxGenField = new JTextField("100", TEXT_WIDTH));
+        optionsBarComponents = new ArrayList<>();
+        optionsBarComponents.add(targetSelector = new JComboBox<>(dataTargetSelector));
+        optionsBarComponents.add(parameterField = new JTextField("", TEXT_WIDTH));
+        optionsBarComponents.add(crField = new JTextField("0.7", TEXT_WIDTH));
+        optionsBarComponents.add(mrField = new JTextField("0.8", TEXT_WIDTH));
+        optionsBarComponents.add(mxField = new JTextField("0.2", TEXT_WIDTH));
+        optionsBarComponents.add(popSizeField = new JTextField("10", TEXT_WIDTH));
+        optionsBarComponents.add(startingValuesField = new JTextField(TEXT_WIDTH));
+        optionsBarComponents.add(searchSpaceField = new JTextField(TEXT_WIDTH));
+        optionsBarComponents.add(maxGenField = new JTextField("100", TEXT_WIDTH));
 
         List<Double> startGraphValues = new ArrayList<>();
         startGraphValues.add(0d);
@@ -96,13 +110,16 @@ public class GuiGA implements PropertyChangeListener {
     }
 
     private void setupComponents(){
-        setupToolbar();
         setupMenus();
+        setupOptionsBar();
+        setupOutputBar();
         mainFrame.add(graphPanel, BorderLayout.CENTER);
         mainFrame.pack();
     }
 
-    private void setupToolbar(){
+    private void setupOptionsBar(){
+
+        optionsBar.setBorder(BorderFactory.createTitledBorder("Options"));
 
         JLabel tLabel = new JLabel("Target function: ");
         JLabel paramLabel = new JLabel("Parameters: ");
@@ -116,7 +133,7 @@ public class GuiGA implements PropertyChangeListener {
 
         setArrayDefaultTextFromTargetFunction();
 
-        for (JComponent component: toolbarComponents) {
+        for (JComponent component: optionsBarComponents) {
 
             // todo key events are not recognised yet for some reason
             component.addKeyListener(new KeyListener() {
@@ -146,30 +163,55 @@ public class GuiGA implements PropertyChangeListener {
         JButton runAlgorithmButtom = new JButton("Run Algorithm");
         runAlgorithmButtom.addActionListener(e -> submitInput());
 
-        // add buttons, label, and textfield to the toolbar
-        toolbar.add(tLabel);
-        toolbar.add(targetSelector);
-        toolbar.add(paramLabel);
-        toolbar.add(parameterField);
-        toolbar.add(crLabel);
-        toolbar.add(crField);
-        toolbar.add(mrLabel);
-        toolbar.add(mrField);
-        toolbar.add(mxLabel);
-        toolbar.add(mxField);
-        toolbar.add(popSizeLabel);
-        toolbar.add(popSizeField);
-        toolbar.add(startingValuesLabel);
-        toolbar.add(startingValuesField);
-        toolbar.add(searchSpaceLabel);
-        toolbar.add(searchSpaceField);
-        toolbar.add(maxGenLabel);
-        toolbar.add(maxGenField);
+        // add buttons, label, and textfield to the optionsBar
+        optionsBar.add(tLabel);
+        optionsBar.add(targetSelector);
+        optionsBar.add(paramLabel);
+        optionsBar.add(parameterField);
+        optionsBar.add(crLabel);
+        optionsBar.add(crField);
+        optionsBar.add(mrLabel);
+        optionsBar.add(mrField);
+        optionsBar.add(mxLabel);
+        optionsBar.add(mxField);
+        optionsBar.add(popSizeLabel);
+        optionsBar.add(popSizeField);
+        optionsBar.add(startingValuesLabel);
+        optionsBar.add(startingValuesField);
+        optionsBar.add(searchSpaceLabel);
+        optionsBar.add(searchSpaceField);
+        optionsBar.add(maxGenLabel);
+        optionsBar.add(maxGenField);
 
-        toolbar.add(runAlgorithmButtom);
-        toolbar.setPreferredSize(new Dimension(TOOLBAR_WIDTH, FRAME_HEIGHT));
-        // add toolbar to north of main frame
-        mainFrame.add(toolbar, BorderLayout.WEST);
+        optionsBar.add(runAlgorithmButtom);
+        optionsBar.setPreferredSize(new Dimension(OPTIONS_BAR_WIDTH, FRAME_HEIGHT));
+        // add optionsBar to north of main frame
+        mainFrame.add(optionsBar, BorderLayout.WEST);
+    }
+
+    private void setupOutputBar() {
+        outputBar.setBorder(BorderFactory.createTitledBorder("Output"));
+
+        targetValueField = new JTextArea(1, TEXT_WIDTH);
+        solutionValueField = new JTextArea(1, TEXT_WIDTH);
+
+        targetValueField.setEditable(false);
+        targetValueField.setBackground(Color.LIGHT_GRAY);
+
+        solutionValueField.setEditable(false);
+        solutionValueField.setBackground(Color.LIGHT_GRAY);
+
+        JLabel targetValueLabel = new JLabel("Target value: ");
+        JLabel solutionValueLabel = new JLabel("Solution: ");
+
+        outputBar.add(targetValueLabel);
+        outputBar.add(targetValueField);
+        outputBar.add(solutionValueLabel);
+        outputBar.add(solutionValueField);
+
+        outputBar.setPreferredSize(new Dimension(OUTPUT_BAR_WIDTH, FRAME_HEIGHT));
+        // add optionsBar to north of main frame
+        mainFrame.add(outputBar, BorderLayout.EAST);
     }
 
     private void setupMenus() {
@@ -259,7 +301,8 @@ public class GuiGA implements PropertyChangeListener {
             SwingUtilities.invokeLater(() -> {
                 Chromosome[][] generations = (Chromosome[][]) event.getNewValue();
                 OutputProcessor op = new OutputProcessor(generations);
-                displayGraph(op.fitnessValues());
+                displayGraph(op.getFitnessValues());
+                displayOutput(op.getSolution(), op.getTargetValue());
             });
         }
     }
@@ -347,6 +390,25 @@ public class GuiGA implements PropertyChangeListener {
 
     public void displayGraph(List<Double> fitnessValues) {
         graphPanel.setScores(fitnessValues);
+    }
+
+    public void displayOutput(double[] solution, double targetValue) {
+
+        // solution
+        StringBuilder solutionTextBuilder = new StringBuilder();
+        DecimalFormat df = new DecimalFormat("#.####");
+        df.setRoundingMode(RoundingMode.CEILING);
+
+        for (double p: solution) {
+            solutionTextBuilder.append(df.format(p));
+            solutionTextBuilder.append("\n");
+        }
+        String solutionText = solutionTextBuilder.substring(0, solutionTextBuilder.length()-2);
+        solutionValueField.setRows(solution.length);
+        solutionValueField.setText(solutionText);
+
+        // target value
+        targetValueField.setText(df.format(targetValue));
     }
 
     public String getDefaultStartingValuesString(int dimensions) {
