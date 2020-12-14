@@ -15,3 +15,7 @@ A simple Java implementation for Genetic Algorithms with CLI and GUI.
 The GA implements
 - random crossover
 - elitist selection
+
+
+### GUI Screenshot
+![Screenshot of the GUI](screenshot.png)
