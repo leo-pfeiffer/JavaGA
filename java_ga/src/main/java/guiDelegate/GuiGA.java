@@ -38,6 +38,7 @@ public class GuiGA implements PropertyChangeListener {
 
     private JMenuBar menuBar;
 
+    private JTextField parameterField;
     private JTextField crField;
     private JTextField mrField;
     private JTextField mxField;
@@ -74,6 +75,7 @@ public class GuiGA implements PropertyChangeListener {
 
         toolbarComponents = new ArrayList<>();
         toolbarComponents.add(targetSelector = new JComboBox<>(dataTargetSelector));
+        toolbarComponents.add(parameterField = new JTextField("", TEXT_WIDTH));
         toolbarComponents.add(crField = new JTextField("0.7", TEXT_WIDTH));
         toolbarComponents.add(mrField = new JTextField("0.8", TEXT_WIDTH));
         toolbarComponents.add(mxField = new JTextField("0.2", TEXT_WIDTH));
@@ -103,6 +105,7 @@ public class GuiGA implements PropertyChangeListener {
     private void setupToolbar(){
 
         JLabel tLabel = new JLabel("Target function: ");
+        JLabel paramLabel = new JLabel("Parameters: ");
         JLabel crLabel = new JLabel("Crossover rate: ");
         JLabel mrLabel = new JLabel("Mutation rate: ");
         JLabel mxLabel = new JLabel("Mutation parameter: ");
@@ -136,7 +139,9 @@ public class GuiGA implements PropertyChangeListener {
             });
         }
 
-        targetSelector.addActionListener(event -> setArrayDefaultTextFromTargetFunction());
+        targetSelector.addActionListener(event -> {
+            setArrayDefaultTextFromTargetFunction();
+        });
 
         JButton runAlgorithmButtom = new JButton("Run Algorithm");
         runAlgorithmButtom.addActionListener(e -> submitInput());
@@ -144,6 +149,8 @@ public class GuiGA implements PropertyChangeListener {
         // add buttons, label, and textfield to the toolbar
         toolbar.add(tLabel);
         toolbar.add(targetSelector);
+        toolbar.add(paramLabel);
+        toolbar.add(parameterField);
         toolbar.add(crLabel);
         toolbar.add(crField);
         toolbar.add(mrLabel);
@@ -259,9 +266,23 @@ public class GuiGA implements PropertyChangeListener {
 
     private void submitInput() {
         try {
-            // Target
+
             String targetName = (String) targetSelector.getSelectedItem();
-            ga.setTarget(registeredTargets.get(targetName));
+            TargetFunction target = registeredTargets.get(targetName);
+
+            if (target.isHasParameters()) {
+                String paramsIn = parameterField.getText();
+                List<String> paramsInRaw = Arrays.asList(paramsIn.split(","));
+
+                double[] params = new double[paramsInRaw.size()];
+                for (int j = 0; j < params.length; j++) {
+                    params[j] = Double.parseDouble(paramsInRaw.get(j));
+                }
+                target.setParameters(params);
+            }
+
+            // Target function
+            ga.setTarget(target);
 
             // Cr
             double cr = Double.parseDouble(crField.getText());
@@ -342,8 +363,26 @@ public class GuiGA implements PropertyChangeListener {
 
     public void setArrayDefaultTextFromTargetFunction() {
         String targetName = (String) targetSelector.getSelectedItem();
-        int dimensions = registeredTargets.get(targetName).getDimension();
+        TargetFunction target = registeredTargets.get(targetName);
+        int dimensions = target.getDimension();
         startingValuesField.setText(getDefaultStartingValuesString(dimensions));
         searchSpaceField.setText(getDefaultSearchSpaceString(dimensions));
+
+        if (target.isHasParameters()) {
+            parameterField.setEditable(true);
+            parameterField.setBackground(Color.WHITE);
+            StringBuilder parameterTextBuilder = new StringBuilder();
+            double[] parameters = target.getParameters();
+            for (double p: parameters) {
+                parameterTextBuilder.append(p);
+                parameterTextBuilder.append(",");
+            }
+            String parameterText = parameterTextBuilder.substring(0, parameterTextBuilder.length()-1);
+            parameterField.setText(parameterText);
+        } else {
+            parameterField.setEditable(false);
+            parameterField.setBackground(Color.LIGHT_GRAY);
+            parameterField.setText("");
+        }
     }
 }

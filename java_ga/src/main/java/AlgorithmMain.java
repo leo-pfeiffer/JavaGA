@@ -1,6 +1,7 @@
 import cliDelegate.CliGA;
 import guiDelegate.GuiGA;
 import model.Target.Multimodal;
+import model.Target.Polynomial;
 import model.Target.Quadratic;
 import model.Target.TargetFunction;
 
@@ -60,6 +61,9 @@ public class AlgorithmMain {
 
         Quadratic quadratic = new Quadratic();
         registeredTargets.put(quadratic.getName(), quadratic);
+
+        Polynomial polynomial = new Polynomial();
+        registeredTargets.put(polynomial.getName(), polynomial);
 
         return registeredTargets;
     }
