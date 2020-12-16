@@ -15,7 +15,6 @@ import java.io.File;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,7 +36,9 @@ public class GuiGA implements PropertyChangeListener {
     private JFrame mainFrame;
 
     private JPanel optionsBar;
-    private JPanel outputBar;
+    private JPanel outputBox;
+    private JPanel infoBar;
+    private JPanel functionInfoBox;
 
     private JComboBox<String> targetSelector;
     private JComboBox<String> paramNumSelector;
@@ -81,7 +82,8 @@ public class GuiGA implements PropertyChangeListener {
         createActions();
 
         optionsBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        outputBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        outputBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        functionInfoBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         menuBar = new JMenuBar();
 
@@ -93,13 +95,12 @@ public class GuiGA implements PropertyChangeListener {
         setupComponents();
 
         this.ga.addObserver(this);
-
     }
 
     private void setupComponents(){
         setupMenus();
         setupOptionsBar();
-        setupOutputBar();
+        setupInfoBox();
         mainFrame.add(graphPanel, BorderLayout.CENTER);
         mainFrame.pack();
         dynamicFieldsOnDimension(startingValuePanel);
@@ -152,6 +153,7 @@ public class GuiGA implements PropertyChangeListener {
             dynamicFieldsOnDimension(startingValuePanel);
             dynamicFieldsOnDimension(searchSpacePanel);
             setParameterSettable();
+            resetFunctionInfoBoxName();
         });
 
         paramNumSelector.addActionListener(event -> {
@@ -172,8 +174,20 @@ public class GuiGA implements PropertyChangeListener {
 
     }
 
-    private void setupOutputBar() {
-        outputBar.setBorder(BorderFactory.createTitledBorder("Output"));
+    private void setupInfoBox() {
+
+        infoBar = new JPanel();
+        GridLayout gl = new GridLayout(2, 1); // 1 row, dimensions columns
+        infoBar.setLayout(gl);
+
+        // Function info box
+        functionInfoBox.setBorder(BorderFactory.createTitledBorder(targetSelector.getSelectedItem().toString()));
+        // todo add info about the function here
+
+        infoBar.add(functionInfoBox);
+
+        // Output Box
+        outputBox.setBorder(BorderFactory.createTitledBorder("Output"));
 
         targetValueField = new JTextArea(1, TEXT_WIDTH);
         solutionValueField = new JTextArea(1, TEXT_WIDTH);
@@ -187,14 +201,16 @@ public class GuiGA implements PropertyChangeListener {
         JLabel targetValueLabel = new JLabel("Target value: ");
         JLabel solutionValueLabel = new JLabel("Solution: ");
 
-        outputBar.add(targetValueLabel);
-        outputBar.add(targetValueField);
-        outputBar.add(solutionValueLabel);
-        outputBar.add(solutionValueField);
+        outputBox.add(targetValueLabel);
+        outputBox.add(targetValueField);
+        outputBox.add(solutionValueLabel);
+        outputBox.add(solutionValueField);
 
-        outputBar.setPreferredSize(new Dimension(OUTPUT_BAR_WIDTH, FRAME_HEIGHT));
+        infoBar.add(outputBox);
+
         // add optionsBar to north of main frame
-        mainFrame.add(outputBar, BorderLayout.EAST);
+        infoBar.setPreferredSize(new Dimension(OUTPUT_BAR_WIDTH, FRAME_HEIGHT));
+        mainFrame.add(infoBar, BorderLayout.EAST);
     }
 
     private void setupMenus() {
@@ -307,8 +323,6 @@ public class GuiGA implements PropertyChangeListener {
                 }
                 target.setParameters(params);
             }
-
-
 
             // Target function
             ga.setTarget(target);
@@ -433,5 +447,9 @@ public class GuiGA implements PropertyChangeListener {
             paramField.setBackground(Color.LIGHT_GRAY);
             paramNumSelector.setEnabled(false);
         }
+    }
+
+    public void resetFunctionInfoBoxName() {
+        functionInfoBox.setBorder(BorderFactory.createTitledBorder(targetSelector.getSelectedItem().toString()));
     }
 }
