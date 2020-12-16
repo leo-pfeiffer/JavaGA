@@ -9,8 +9,6 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -42,18 +40,20 @@ public class GuiGA implements PropertyChangeListener {
     private JPanel outputBar;
 
     private JComboBox<String> targetSelector;
+    private JComboBox<String> paramNumSelector;
     private GraphPanel graphPanel;
 
     private JMenuBar menuBar;
 
-    private JTextField parameterField;
     private JTextField crField;
     private JTextField mrField;
     private JTextField mxField;
     private JTextField popSizeField;
-    private JTextField startingValuesField;
-    private JTextField searchSpaceField;
     private JTextField maxGenField;
+
+    private JPanel startingValuePanel;
+    private JPanel searchSpacePanel;
+    private JPanel parameterPanel;
 
     private JTextArea targetValueField;
     private JTextArea solutionValueField;
@@ -85,19 +85,6 @@ public class GuiGA implements PropertyChangeListener {
 
         menuBar = new JMenuBar();
 
-        String [] dataTargetSelector = registeredTargets.keySet().toArray(new String[0]);
-
-        optionsBarComponents = new ArrayList<>();
-        optionsBarComponents.add(targetSelector = new JComboBox<>(dataTargetSelector));
-        optionsBarComponents.add(parameterField = new JTextField("", TEXT_WIDTH));
-        optionsBarComponents.add(crField = new JTextField("0.7", TEXT_WIDTH));
-        optionsBarComponents.add(mrField = new JTextField("0.8", TEXT_WIDTH));
-        optionsBarComponents.add(mxField = new JTextField("0.2", TEXT_WIDTH));
-        optionsBarComponents.add(popSizeField = new JTextField("10", TEXT_WIDTH));
-        optionsBarComponents.add(startingValuesField = new JTextField(TEXT_WIDTH));
-        optionsBarComponents.add(searchSpaceField = new JTextField(TEXT_WIDTH));
-        optionsBarComponents.add(maxGenField = new JTextField("100", TEXT_WIDTH));
-
         List<Double> startGraphValues = new ArrayList<>();
         startGraphValues.add(0d);
         graphPanel = new GraphPanel(startGraphValues);
@@ -115,78 +102,74 @@ public class GuiGA implements PropertyChangeListener {
         setupOutputBar();
         mainFrame.add(graphPanel, BorderLayout.CENTER);
         mainFrame.pack();
+        dynamicFieldsOnDimension(startingValuePanel);
+        dynamicFieldsOnDimension(searchSpacePanel);
+        dynamicFieldsOnParameters();
     }
 
     private void setupOptionsBar(){
 
-        optionsBar.setBorder(BorderFactory.createTitledBorder("Options"));
-
-        JLabel tLabel = new JLabel("Target function: ");
-        JLabel paramLabel = new JLabel("Parameters: ");
-        JLabel crLabel = new JLabel("Crossover rate: ");
-        JLabel mrLabel = new JLabel("Mutation rate: ");
-        JLabel mxLabel = new JLabel("Mutation parameter: ");
-        JLabel popSizeLabel = new JLabel("Population size: ");
-        JLabel startingValuesLabel = new JLabel("Starting values: ");
-        JLabel searchSpaceLabel = new JLabel("Search space: ");
-        JLabel maxGenLabel = new JLabel("Max. generation: ");
-
-        setArrayDefaultTextFromTargetFunction();
-
-        for (JComponent component: optionsBarComponents) {
-
-            // todo key events are not recognised yet for some reason
-            component.addKeyListener(new KeyListener() {
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                        submitInput();
-                    }
-                }
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-
-                }
-            });
-        }
-
-        targetSelector.addActionListener(event -> {
-            setArrayDefaultTextFromTargetFunction();
-        });
-
         JButton runAlgorithmButtom = new JButton("Run Algorithm");
         runAlgorithmButtom.addActionListener(e -> submitInput());
 
-        // add buttons, label, and textfield to the optionsBar
-        optionsBar.add(tLabel);
-        optionsBar.add(targetSelector);
-        optionsBar.add(paramLabel);
-        optionsBar.add(parameterField);
-        optionsBar.add(crLabel);
-        optionsBar.add(crField);
-        optionsBar.add(mrLabel);
-        optionsBar.add(mrField);
-        optionsBar.add(mxLabel);
-        optionsBar.add(mxField);
-        optionsBar.add(popSizeLabel);
-        optionsBar.add(popSizeField);
-        optionsBar.add(startingValuesLabel);
-        optionsBar.add(startingValuesField);
-        optionsBar.add(searchSpaceLabel);
-        optionsBar.add(searchSpaceField);
-        optionsBar.add(maxGenLabel);
-        optionsBar.add(maxGenField);
+        startingValuePanel = new JPanel();
+        searchSpacePanel = new JPanel();
+        parameterPanel = new JPanel();
+
+        String [] dataTargetSelector = registeredTargets.keySet().toArray(new String[0]);
+        String [] dataParamNumSelector = {"1", "2", "3", "4"};
+
+        optionsBarComponents = new ArrayList<>();
+
+        optionsBarComponents.add(new JLabel("Target function: "));
+        optionsBarComponents.add(targetSelector = new JComboBox<>(dataTargetSelector));
+        optionsBarComponents.add(new JLabel("# parameters: "));
+        optionsBarComponents.add(paramNumSelector = new JComboBox<>(dataParamNumSelector));
+        optionsBarComponents.add(new JLabel("Parameters: "));
+        optionsBarComponents.add(parameterPanel);
+        optionsBarComponents.add(new JLabel("Crossover rate: "));
+        optionsBarComponents.add(crField = new JTextField("0.7", TEXT_WIDTH));
+        optionsBarComponents.add(new JLabel("Mutation rate: "));
+        optionsBarComponents.add(mrField = new JTextField("0.8", TEXT_WIDTH));
+        optionsBarComponents.add(new JLabel("Mutation parameter: "));
+        optionsBarComponents.add(mxField = new JTextField("0.2", TEXT_WIDTH));
+        optionsBarComponents.add(new JLabel("Population size: "));
+        optionsBarComponents.add(popSizeField = new JTextField("10", TEXT_WIDTH));
+        optionsBarComponents.add(new JLabel("Starting values: "));
+        optionsBarComponents.add(startingValuePanel);
+        optionsBarComponents.add(new JLabel("Search space: "));
+        optionsBarComponents.add(searchSpacePanel);
+        optionsBarComponents.add(new JLabel("Max. generation: "));
+        optionsBarComponents.add(maxGenField = new JTextField("100", TEXT_WIDTH));
+        optionsBarComponents.add(runAlgorithmButtom);
+
+        GridLayout gl = new GridLayout(11, 2); // 1 row, dimensions columns
+        optionsBar.setLayout(gl);
+
+        optionsBar.setBorder(BorderFactory.createTitledBorder("Options"));
+
+        targetSelector.addActionListener(event -> {
+            dynamicFieldsOnDimension(startingValuePanel);
+            dynamicFieldsOnDimension(searchSpacePanel);
+            setParameterSettable();
+        });
+
+        paramNumSelector.addActionListener(event -> {
+            dynamicFieldsOnParameters();
+        });
+
+
+        // add buttons, label, and TextField to the optionsBar
+        for (JComponent comp: optionsBarComponents) {
+            optionsBar.add(comp);
+        }
 
         optionsBar.add(runAlgorithmButtom);
+
         optionsBar.setPreferredSize(new Dimension(OPTIONS_BAR_WIDTH, FRAME_HEIGHT));
-        // add optionsBar to north of main frame
+        // add optionsBar to West of main frame
         mainFrame.add(optionsBar, BorderLayout.WEST);
+
     }
 
     private void setupOutputBar() {
@@ -308,83 +291,72 @@ public class GuiGA implements PropertyChangeListener {
     }
 
     private void submitInput() {
+        // todo split this into functions
         try {
 
             String targetName = (String) targetSelector.getSelectedItem();
             TargetFunction target = registeredTargets.get(targetName);
 
+            // If parameters are allowed, get number of parameters
             if (target.isHasParameters()) {
-                String paramsIn = parameterField.getText();
-                List<String> paramsInRaw = Arrays.asList(paramsIn.split(","));
-
-                double[] params = new double[paramsInRaw.size()];
-                for (int j = 0; j < params.length; j++) {
-                    params[j] = Double.parseDouble(paramsInRaw.get(j));
+                int numParams = Integer.parseInt(paramNumSelector.getSelectedItem().toString());
+                double[] params = new double[numParams];
+                for (int i = 0; i < numParams; i++) {
+                    JTextField val = (JTextField) parameterPanel.getComponent(i);
+                    params[i] = Double.parseDouble(val.getText());
                 }
                 target.setParameters(params);
             }
 
+
+
             // Target function
             ga.setTarget(target);
 
-            // Cr
+            // Crossover rate
             double cr = Double.parseDouble(crField.getText());
             ga.setCr(cr);
 
-            // Mr
+            // Mutation rate
             double mr = Double.parseDouble(mrField.getText());
             ga.setMr(mr);
 
-            // Mx
+            // Mutation parameter
             double mx = Double.parseDouble(mxField.getText());
             ga.setMx(mx);
 
-            // Pop Size
+            // Population Size
             int popSize = Integer.parseInt(popSizeField.getText());
             ga.setPopSize(popSize);
 
             // Starting values
             int dimensions = registeredTargets.get(targetName).getDimension();
-            String startingValuesIn = startingValuesField.getText();
-            List<String> startingValuesRaw = Arrays.asList(startingValuesIn.split(","));
-
-            if (startingValuesRaw.toArray().length != dimensions) {
-                throw new IllegalArgumentException("Incorrect number of dimensions.\n" +
-                        "Expected " + dimensions + " but got " + startingValuesRaw.toArray().length);
-            }
-
             double[] startingValues = new double[dimensions];
-            for (int j = 0; j < startingValues.length; j++) {
-                startingValues[j] = Double.parseDouble(startingValuesRaw.get(j));
+            for (int i = 0; i < dimensions; i++) {
+                JTextField val = (JTextField) startingValuePanel.getComponent(i);
+                startingValues[i] = Double.parseDouble(val.getText());
             }
             ga.setStartingValues(startingValues);
 
-            // search space
-            String searchSpaceIn = searchSpaceField.getText();
-            List<String> searchSpaceRaw = Arrays.asList(searchSpaceIn.split(","));
-
-            if (searchSpaceRaw.toArray().length != dimensions) {
-                throw new IllegalArgumentException("Incorrect number of dimensions.\n" +
-                        "Expected " + dimensions + " but got " + searchSpaceRaw.toArray().length);
-            }
-
+            // Search space
             double[] searchSpace = new double[dimensions];
-            for (int j = 0; j < searchSpace.length; j++) {
-                searchSpace[j] = Double.parseDouble(searchSpaceRaw.get(j));
+            for (int i = 0; i < dimensions; i++) {
+                JTextField val = (JTextField) searchSpacePanel.getComponent(i);
+                searchSpace[i] = Double.parseDouble(val.getText());
             }
             ga.setSearchSpace(searchSpace);
 
-            // max gen
+            // Maximum generation
             int maxGen = Integer.parseInt(maxGenField.getText());
             ga.setMaxGen(maxGen);
 
-            // run algorithm
+            // Run algorithm
             ga.runAlgorithm();
 
 
         } catch (Exception exc) {
+            JOptionPane.showMessageDialog(mainFrame, "Ooops, your arguments were faulty!");
             throw new IllegalArgumentException(exc);
-            // JOptionPane.showMessageDialog(mainFrame, "Ooops, your arguments were faulty!");
         }
     }
 
@@ -411,40 +383,55 @@ public class GuiGA implements PropertyChangeListener {
         targetValueField.setText(df.format(targetValue));
     }
 
-    public String getDefaultStartingValuesString(int dimensions) {
-        String startingValuesIn = "0,".repeat(dimensions);
-        startingValuesIn = startingValuesIn.substring(0, startingValuesIn.length()-1);
-        return startingValuesIn;
-    }
+    public void dynamicFieldsOnDimension(JPanel panel) {
 
-    public String getDefaultSearchSpaceString(int dimensions) {
-        String searchSpaceIn = "1,".repeat(dimensions);
-        searchSpaceIn = searchSpaceIn.substring(0, searchSpaceIn.length()-1);
-        return searchSpaceIn;
-    }
-
-    public void setArrayDefaultTextFromTargetFunction() {
         String targetName = (String) targetSelector.getSelectedItem();
         TargetFunction target = registeredTargets.get(targetName);
         int dimensions = target.getDimension();
-        startingValuesField.setText(getDefaultStartingValuesString(dimensions));
-        searchSpaceField.setText(getDefaultSearchSpaceString(dimensions));
+
+        panel.removeAll();
+        GridLayout gl = new GridLayout(1, dimensions); // 1 row, dimensions columns
+        panel.setLayout(gl);
+
+        for (int i = 0; i < dimensions; i++){
+            panel.add(new JTextField());
+        }
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    public void dynamicFieldsOnParameters() {
+
+        int numParams = Integer.parseInt(paramNumSelector.getSelectedItem().toString());
+
+        parameterPanel.removeAll();
+        GridLayout gl = new GridLayout(1, numParams); // 1 row, dimensions columns
+        parameterPanel.setLayout(gl);
+
+        for (int i = 0; i < numParams; i++){
+            parameterPanel.add(new JTextField());
+        }
+
+        parameterPanel.revalidate();
+        parameterPanel.repaint();
+    }
+
+    public void setParameterSettable() {
+        String targetName = (String) targetSelector.getSelectedItem();
+        TargetFunction target = registeredTargets.get(targetName);
 
         if (target.isHasParameters()) {
-            parameterField.setEditable(true);
-            parameterField.setBackground(Color.WHITE);
-            StringBuilder parameterTextBuilder = new StringBuilder();
-            double[] parameters = target.getParameters();
-            for (double p: parameters) {
-                parameterTextBuilder.append(p);
-                parameterTextBuilder.append(",");
-            }
-            String parameterText = parameterTextBuilder.substring(0, parameterTextBuilder.length()-1);
-            parameterField.setText(parameterText);
+            JTextField paramField = (JTextField) parameterPanel.getComponent(0);
+            paramField.setEnabled(true);
+            paramField.setBackground(Color.WHITE);
+            paramNumSelector.setEnabled(true);
         } else {
-            parameterField.setEditable(false);
-            parameterField.setBackground(Color.LIGHT_GRAY);
-            parameterField.setText("");
+            paramNumSelector.setSelectedItem("1");
+            JTextField paramField = (JTextField) parameterPanel.getComponent(0);
+            paramField.setEnabled(false);
+            paramField.setBackground(Color.LIGHT_GRAY);
+            paramNumSelector.setEnabled(false);
         }
     }
 }
