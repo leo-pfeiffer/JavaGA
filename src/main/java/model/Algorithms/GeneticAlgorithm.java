@@ -37,9 +37,10 @@ public class GeneticAlgorithm extends Algorithm {
     Chromosome[] intermediatePop;
 
     /* The property change support object to use when notifying listeners of the model. */
-    private PropertyChangeSupport notifier;
+    private final PropertyChangeSupport notifier;
 
     public GeneticAlgorithm() {
+        super("Genetic");
         notifier = new PropertyChangeSupport(this);
     }
 

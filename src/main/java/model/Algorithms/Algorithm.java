@@ -10,11 +10,17 @@ public abstract class Algorithm {
     /** Target function to be optimised */
     TargetFunction target;
 
+    private String name;
+
     /** Starting values. */
     double[] startingValues;
 
     /** Search space. */
     double[] searchSpace;
+
+    public Algorithm(String name) {
+        this.name = name;
+    }
 
     /** Set the target function for the algorithm.
      * @param target A TargetFunction object to be optimised. */
@@ -50,4 +56,10 @@ public abstract class Algorithm {
     /** Get an array with the Solutions of the last generation.
      * @return Array with the Solutions of the last generation*/
     public abstract Solution[] getLastGeneration();
+
+    public String getName() {
+        return this.name;
+    }
 }
+
+

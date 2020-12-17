@@ -1,5 +1,7 @@
 import cliDelegate.CliGA;
 import guiDelegate.Gui;
+import model.Algorithms.Algorithm;
+import model.Algorithms.GeneticAlgorithm;
 import model.Targets.Multimodal;
 import model.Targets.Polynomial;
 import model.Targets.Quadratic;
@@ -12,6 +14,7 @@ public class AlgorithmMain {
     public static void main(String[] args) {
 
         HashMap<String, TargetFunction> registeredTargets = registerTargets();
+        HashMap<String, Algorithm> registeredAlgos = registerAlgos();
 
         String delegate = "";
 
@@ -44,7 +47,7 @@ public class AlgorithmMain {
         }
 
         if (delegate.equals("gui")) {
-            Gui gui = new Gui(registeredTargets);
+            Gui gui = new Gui(registeredTargets, registeredAlgos);
         }
 
         else {
@@ -66,5 +69,14 @@ public class AlgorithmMain {
         registeredTargets.put(polynomial.getName(), polynomial);
 
         return registeredTargets;
+    }
+
+    public static HashMap<String, Algorithm> registerAlgos() {
+        HashMap<String, Algorithm> registeredAlgos = new HashMap<>();
+
+        GeneticAlgorithm genetigAlgo = new GeneticAlgorithm();
+        registeredAlgos.put(genetigAlgo.getName(), genetigAlgo);
+
+        return registeredAlgos;
     }
 }
