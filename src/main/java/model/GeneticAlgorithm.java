@@ -12,10 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 
 /** Implements the genetic algorithm with all associated functions. */
-public class GeneticAlgorithm {
-
-    /** Target function to be optimised */
-    TargetFunction target;
+public class GeneticAlgorithm extends Algorithm {
 
     /** Crossover rate. */
     double cr;
@@ -32,12 +29,6 @@ public class GeneticAlgorithm {
     /** Maximum generation number. */
     int maxGen;
 
-    /** Starting values. */
-    double[] startingValues;
-
-    /** Search space. */
-    double[] searchSpace;
-
     /** Nested ArrayList of the populations of each generation. */
     Chromosome[][] generations;
 
@@ -50,7 +41,6 @@ public class GeneticAlgorithm {
     public GeneticAlgorithm() {
         notifier = new PropertyChangeSupport(this);
     }
-
 
     public void setAttributes(TargetFunction target, double cr, double mr, double mx, int popSize,
                               int maxGen, double [] startingValues, double[] searchSpace) {
@@ -66,56 +56,49 @@ public class GeneticAlgorithm {
         this.searchSpace = searchSpace;
     }
 
-    public void setTarget(TargetFunction target) {
-        this.target = target;
-    }
-
+    /** Setter for Crossover rate.
+     * @param cr crossover rate. */
     public void setCr(double cr) {
         this.cr = cr;
     }
 
+    /** Setter for mutation rate.
+     * @param mr mutation rate. */
     public void setMr(double mr) {
         this.mr = mr;
     }
 
+    /** Setter for mutation parameter.
+     * @param mx mutation parameter. */
     public void setMx(double mx) {
         this.mx = mx;
     }
 
+    /** Setter for population size
+     * @param popSize population size. */
     public void setPopSize(int popSize) {
         this.popSize = popSize;
     }
 
-    public void setStartingValues(double[] startingValues){
-        this.startingValues = startingValues;
-    }
-
-    public void setSearchSpace (double[] searchSpace){
-        this.searchSpace = searchSpace;
-    }
-
+    /** Setter for maximum generation.
+     * @param maxGen maximum generation. */
     public void setMaxGen(int maxGen) {
         this.maxGen = maxGen;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public Chromosome[][] getGenerations() {
         return this.generations;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public Chromosome[] getLastGeneration() {
         return this.generations[this.generations.length - 1];
     }
 
-    public double getFitness() {
-        return getFittestChromosome().getFitness();
-    }
-
-    public Chromosome getFittestChromosome() {
-        List<Chromosome> lastGen = Arrays.asList(this.getLastGeneration().clone());
-        Collections.sort(lastGen);
-        return lastGen.get(0);
-    }
-
+    /** {@inheritDoc} */
     public void runAlgorithm() {
 
         // initialise the generations and intermediate population
@@ -125,10 +108,11 @@ public class GeneticAlgorithm {
         // set the parent population
         for (int i = 0; i < popSize; i++) {
             Chromosome chromosome = new Chromosome(this.target, this.startingValues, this.searchSpace);
-            chromosome.evaluateFitness();
+            chromosome.evaluateTargetValue();
             generations[0][i] = chromosome;
         }
 
+        // main loop: this is where the survival of the fittest takes place
         for (int gen = 0; gen < maxGen; gen++) {
             System.out.print("" + gen + " / " + maxGen + "\r");
             this.crossover(gen);
@@ -139,8 +123,13 @@ public class GeneticAlgorithm {
         notifier.firePropertyChange("run_complete", null, this.generations);
     }
 
+    /** Performs the crossover of the chromosomes in the current generation. Random crossover
+     * is used here, i.e. chromosomes are split in two at a random cut point and the resulting
+     * halves are recombined between two chromosomes.
+     * @param gen Number of the current generation. */
     private void crossover(int gen) {
 
+        // Create the crossover pool from the current generation
         Chromosome[] pool = generations[gen];
 
         // 1d functions cannot crossover
@@ -156,21 +145,24 @@ public class GeneticAlgorithm {
                 pool[i] = chrom;
             }
 
+            // Apply crossover to Chromosome pairs of two.
             for (int i = 0; i < Math.ceil((double) popSize / 2); i++) {
+
+                // Crossover cut
                 int cut = rand.nextInt(target.getDimension()-1) + 1;
 
                 // create first crossover part
                 double[] cross1Start = new double[cut];
-                System.arraycopy(pool[i*2].getGenes(), 0, cross1Start, 0, cut);
+                System.arraycopy(pool[i*2].getSolutions(), 0, cross1Start, 0, cut);
                 double[] cross1End = new double[target.getDimension()-cut];
-                System.arraycopy(pool[i*2+1].getGenes(), cut, cross1End, 0, target.getDimension()-cut);
+                System.arraycopy(pool[i*2+1].getSolutions(), cut, cross1End, 0, target.getDimension()-cut);
                 double[] cross1 = ArrayUtils.addAll(cross1Start, cross1End);
 
                 // create second crossover part
                 double[] cross2Start = new double[cut];
-                System.arraycopy(pool[i*2+1].getGenes(), 0, cross2Start, 0, cut);
+                System.arraycopy(pool[i*2+1].getSolutions(), 0, cross2Start, 0, cut);
                 double[] cross2End = new double[target.getDimension()-cut];
-                System.arraycopy(pool[i*2].getGenes(), cut, cross2End, 0, target.getDimension()-cut);
+                System.arraycopy(pool[i*2].getSolutions(), cut, cross2End, 0, target.getDimension()-cut);
                 double[] cross2 = ArrayUtils.addAll(cross2Start, cross2End);
 
                 // Create new Chromosomes
@@ -180,13 +172,19 @@ public class GeneticAlgorithm {
         }
     }
 
+    /** Mutation step of the algorithm. The mutation is controlled both by the mutation rate mr, i.e.
+     * the probability of a gene mutating, and the mutation parameter mx, which controls the
+     * extent of mutation. */
     private void mutation() {
         double[] genes;
+
+        // Iterate over all solutions of the current intermediate generation.
         for (int i = 0; i < this.popSize; i++) {
             double[] newGenes = new double[target.getDimension()];
             Chromosome chromosome = this.intermediatePop[i];
-            genes = chromosome.getGenes();
+            genes = chromosome.getSolutions();
 
+            // Make mutation decision for each value of the current solution.
             for (int g = 0; g < newGenes.length; g++) {
                 double u = Math.random();
                 if (u <= this.mr) {
@@ -196,8 +194,9 @@ public class GeneticAlgorithm {
                 }
             }
 
+            // Create new chromosomes from the mutated solutions.
             Chromosome newChromosome = new Chromosome(target, newGenes);
-            newChromosome.evaluateFitness();
+            newChromosome.evaluateTargetValue();
             this.intermediatePop[i] = newChromosome;
         }
     }
@@ -216,10 +215,8 @@ public class GeneticAlgorithm {
         }
     }
 
-    /**
-     * Utility method to add an observer using this object's private (encapsulated) property change support object.
-     * @param listener the listener to add
-     */
+    /** {@inheritDoc} */
+    @Override
     public void addObserver(PropertyChangeListener listener) {
         notifier.addPropertyChangeListener(listener);
     }
