@@ -2,7 +2,7 @@ package model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import model.Solutions.Chromosome;
+import model.Solutions.Solution;
 
 import javax.swing.JFileChooser;
 import java.io.File;
@@ -18,9 +18,9 @@ import java.util.Scanner;
 /** model.OutputProcessor handles the output produced by the Genetic Algorithm. */
 public class OutputProcessor {
 
-    Chromosome[][] generations;
+    Solution[][] generations;
 
-    public OutputProcessor(Chromosome[][] generations) {
+    public OutputProcessor(Solution[][] generations) {
         this.generations = generations;
     }
 
@@ -29,8 +29,8 @@ public class OutputProcessor {
 
         List<Double> fitnessValues = new ArrayList<>();
 
-        for (Chromosome[] generation : generations) {
-            List<Chromosome> gen = Arrays.asList(generation.clone());
+        for (Solution[] generation : generations) {
+            List<Solution> gen = Arrays.asList(generation.clone());
             Collections.sort(gen);
             double[] genes = gen.get(0).getSolutions();
             double fitness = gen.get(0).getTargetValue();
@@ -39,20 +39,15 @@ public class OutputProcessor {
         return fitnessValues;
     }
 
-    public Chromosome getSolutionChromosome() {
-        Chromosome[] lastGen = this.generations[this.generations.length-1].clone();
-        List<Chromosome> gen = Arrays.asList(lastGen);
+    public Solution getSolution() {
+        Solution[] lastGen = this.generations[this.generations.length-1].clone();
+        List<Solution> gen = Arrays.asList(lastGen);
         Collections.sort(gen);
         return gen.get(0);
     }
 
-    public double[] getSolution() {
-        Chromosome solutionChrom = getSolutionChromosome();
-        return solutionChrom.getSolutions();
-    }
-
     public double getTargetValue() {
-        Chromosome solutionChrom = getSolutionChromosome();
+        Solution solutionChrom = getSolution();
         return solutionChrom.getTargetValue();
     }
 
@@ -108,8 +103,8 @@ public class OutputProcessor {
 
     public void printGenerations() {
 
-        for (Chromosome[] generation : generations) {
-            List<Chromosome> gen = Arrays.asList(generation.clone());
+        for (Solution[] generation : generations) {
+            List<Solution> gen = Arrays.asList(generation.clone());
             Collections.sort(gen);
             double[] genes = gen.get(0).getSolutions();
             double fitness = gen.get(0).getTargetValue();

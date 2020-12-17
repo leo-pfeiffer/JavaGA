@@ -1,5 +1,5 @@
 import cliDelegate.CliGA;
-import guiDelegate.GuiGA;
+import guiDelegate.Gui;
 import model.Targets.Multimodal;
 import model.Targets.Polynomial;
 import model.Targets.Quadratic;
@@ -44,7 +44,7 @@ public class AlgorithmMain {
         }
 
         if (delegate.equals("gui")) {
-            GuiGA guiGA = new GuiGA(registeredTargets);
+            Gui gui = new Gui(registeredTargets);
         }
 
         else {
