@@ -30,8 +30,8 @@ public class OutputProcessor {
         for (Chromosome[] generation : generations) {
             List<Chromosome> gen = Arrays.asList(generation.clone());
             Collections.sort(gen);
-            double[] genes = gen.get(0).getGenes();
-            double fitness = gen.get(0).getFitness();
+            double[] genes = gen.get(0).getSolutions();
+            double fitness = gen.get(0).getTargetValue();
             fitnessValues.add(fitness);
         }
         return fitnessValues;
@@ -46,12 +46,12 @@ public class OutputProcessor {
 
     public double[] getSolution() {
         Chromosome solutionChrom = getSolutionChromosome();
-        return solutionChrom.getGenes();
+        return solutionChrom.getSolutions();
     }
 
     public double getTargetValue() {
         Chromosome solutionChrom = getSolutionChromosome();
-        return solutionChrom.getFitness();
+        return solutionChrom.getTargetValue();
     }
 
     public String filePathFromSaveDialog() {
@@ -109,8 +109,8 @@ public class OutputProcessor {
         for (Chromosome[] generation : generations) {
             List<Chromosome> gen = Arrays.asList(generation.clone());
             Collections.sort(gen);
-            double[] genes = gen.get(0).getGenes();
-            double fitness = gen.get(0).getFitness();
+            double[] genes = gen.get(0).getSolutions();
+            double fitness = gen.get(0).getTargetValue();
 
             System.out.print("(");
             for (int i = 0; i < genes.length; i++) {

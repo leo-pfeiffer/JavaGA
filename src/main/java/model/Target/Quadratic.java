@@ -10,7 +10,7 @@ public class Quadratic extends TargetFunction {
 
     @Override
     public double evaluate (Chromosome chromosome) {
-        double x = chromosome.getGene(0);
+        double x = chromosome.getSolution(0);
 
         return (0.5d * (Math.pow(x, 2)) + 2 * x);
     }

@@ -10,8 +10,8 @@ public class Multimodal extends TargetFunction {
 
     @Override
     public double evaluate (Chromosome chromosome) {
-        double x = chromosome.getGene(0);
-        double y = chromosome.getGene(1);
+        double x = chromosome.getSolution(0);
+        double y = chromosome.getSolution(1);
 
         double modes = Math.pow(x, 4) - 5 * Math.pow(x, 2) + Math.pow(y, 4) - 5 * Math.pow(y, 2);
         double tilt = 0.5 * x * y + 0.3 * x + 15;

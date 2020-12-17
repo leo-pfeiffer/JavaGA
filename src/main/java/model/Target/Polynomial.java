@@ -13,7 +13,7 @@ public class Polynomial extends TargetFunction {
     @Override
     public double evaluate (Chromosome chromosome) {
         double y = 0d;
-        double x = chromosome.getGene(0);
+        double x = chromosome.getSolution(0);
 
         double[] params = getParameters();
 
