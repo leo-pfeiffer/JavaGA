@@ -90,4 +90,6 @@ public abstract class AlgorithmOptionsBar extends JPanel {
         dynamicFieldsOnDimension(searchSpacePanel);
         dynamicFieldsOnParameters();
     }
+
+
 }

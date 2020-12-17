@@ -22,7 +22,8 @@ import java.util.List;
 
 public class Gui implements PropertyChangeListener {
 
-    private HashMap<String, TargetFunction> registeredTargets;
+    private final HashMap<String, TargetFunction> registeredTargets;
+    private final HashMap<String, Algorithm> registeredAlgos;
     private Algorithm algo;
 
     private static final int MIN_FRAME_HEIGHT = 500;
@@ -43,21 +44,10 @@ public class Gui implements PropertyChangeListener {
     private JPanel infoBar;
     private JPanel functionInfoBox;
 
-//    private JComboBox<String> targetSelector;
-//    private JComboBox<String> paramNumSelector;
+    private JComboBox<String> algoSelector;
     private GraphPanel graphPanel;
 
     private JMenuBar menuBar;
-
-//    private JTextField crField;
-//    private JTextField mrField;
-//    private JTextField mxField;
-//    private JTextField popSizeField;
-//    private JTextField maxGenField;
-//
-//    private JPanel startingValuePanel;
-//    private JPanel searchSpacePanel;
-//    private JPanel parameterPanel;
 
     private JTextArea targetValueField;
     private JTextArea solutionValueField;
@@ -67,13 +57,12 @@ public class Gui implements PropertyChangeListener {
     /** Action to open the help dialog. */
     Action helpAction;
 
-//    private ArrayList<JComponent> optionsBarComponents;
-
-    public Gui(HashMap<String, TargetFunction> registeredTargets){
+    public Gui(HashMap<String, TargetFunction> registeredTargets, HashMap<String, Algorithm> registeredAlgos){
         this.registeredTargets = registeredTargets;
+        this.registeredAlgos = registeredAlgos;
 
         // setup model (ga)
-        this.algo = new GeneticAlgorithm();
+//        this.algo = new GeneticAlgorithm();
 
         mainFrame = new JFrame("GA");
         mainFrame.setMinimumSize(new Dimension(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT));
@@ -111,16 +100,41 @@ public class Gui implements PropertyChangeListener {
 
     private void setupOptionsBar(){
 
-        // todo: if GeneticAlgorithm {}
-        algorithmOptionsBar = new GeneticAlgorithmOptionsBar(this);
-        algorithmOptionsBar.setup();
+        // Set up algoSelector
+        String [] dataAlgoSelector = registeredAlgos.keySet().toArray(new String[0]);
+        algoSelector = new JComboBox<>(dataAlgoSelector);
 
+        JPanel algoSelectorPanel = new JPanel();
+        GridLayout gl = new GridLayout(1,2); // 1 row, dimensions columns
+        algoSelectorPanel.setLayout(gl);
+        algoSelectorPanel.add(new JLabel("Algorithm:"));
+        algoSelectorPanel.add(algoSelector);
+        algoSelectorPanel.setBorder(BorderFactory.createEmptyBorder());
+
+        optionsBar.add(algoSelectorPanel);
+
+        algoSelector.addActionListener(e -> {
+            this.algo = registeredAlgos.get(getAlgoSelectorSelected());
+        });
+
+        // Select selected algo as this.algo
+        this.algo = registeredAlgos.get(getAlgoSelectorSelected());
+
+        // Determine which AlgorithmOptionsBar to use
+        if (this.algo instanceof GeneticAlgorithm) {
+            algorithmOptionsBar = new GeneticAlgorithmOptionsBar(this);
+        } else {
+            JOptionPane.showMessageDialog(this.mainFrame, "Ooops, this algorithm is not registered!");
+            throw new RuntimeException("This algorithm is not registered: " + getAlgoSelectorSelected());
+        }
+
+        // Setup und add AlgorithmOptionsBar
+        algorithmOptionsBar.setup();
         optionsBar.add(algorithmOptionsBar);
 
+        // Set size of optionsBar and add to mainFrame
         optionsBar.setPreferredSize(new Dimension(OPTIONS_BAR_WIDTH, FRAME_HEIGHT));
-        // add optionsBar to West of main frame
         mainFrame.add(optionsBar, BorderLayout.WEST);
-
     }
 
     private void setupInfoBox() {
@@ -293,5 +307,9 @@ public class Gui implements PropertyChangeListener {
 
     public JFrame getMainFrame() {
         return this.mainFrame;
+    }
+
+    public String getAlgoSelectorSelected() {
+        return this.algoSelector.getSelectedItem().toString();
     }
 }

@@ -36,11 +36,8 @@ public class GeneticAlgorithm extends Algorithm {
     /** Intermediate population. */
     Chromosome[] intermediatePop;
 
-    /* The property change support object to use when notifying listeners of the model. */
-    private PropertyChangeSupport notifier;
-
     public GeneticAlgorithm() {
-        notifier = new PropertyChangeSupport(this);
+        super("Genetic");
     }
 
     public void setAttributes(TargetFunction target, double cr, double mr, double mx, int popSize,
@@ -95,7 +92,7 @@ public class GeneticAlgorithm extends Algorithm {
 
     /** {@inheritDoc} */
     @Override
-    public Chromosome[] getLastGeneration() {
+    public Chromosome[] getOptimalGeneration() {
         return this.generations[this.generations.length - 1];
     }
 
@@ -214,11 +211,5 @@ public class GeneticAlgorithm extends Algorithm {
         for (int i = 0; i < this.popSize; i++) {
             this.generations[gen+1][i] = pool.get(i);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addObserver(PropertyChangeListener listener) {
-        notifier.addPropertyChangeListener(listener);
     }
 }

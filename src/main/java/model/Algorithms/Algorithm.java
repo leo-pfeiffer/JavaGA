@@ -4,17 +4,28 @@ import model.Solutions.Solution;
 import model.Targets.TargetFunction;
 
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 public abstract class Algorithm {
 
     /** Target function to be optimised */
     TargetFunction target;
 
+    private String name;
+
     /** Starting values. */
     double[] startingValues;
 
     /** Search space. */
     double[] searchSpace;
+
+    /* The property change support object to use when notifying listeners of the model. */
+    protected final PropertyChangeSupport notifier;
+
+    public Algorithm(String name) {
+        this.name = name;
+        notifier = new PropertyChangeSupport(this);
+    }
 
     /** Set the target function for the algorithm.
      * @param target A TargetFunction object to be optimised. */
@@ -38,7 +49,9 @@ public abstract class Algorithm {
      * Utility method to add an observer using this object's private (encapsulated) property change support object.
      * @param listener the listener to add
      */
-    public abstract void addObserver(PropertyChangeListener listener);
+    public void addObserver(PropertyChangeListener listener) {
+        notifier.addPropertyChangeListener(listener);
+    }
 
     /** Controls each step of the algorithm and controls the necessary steps. */
     public abstract void runAlgorithm();
@@ -49,5 +62,11 @@ public abstract class Algorithm {
 
     /** Get an array with the Solutions of the last generation.
      * @return Array with the Solutions of the last generation*/
-    public abstract Solution[] getLastGeneration();
+    public abstract Solution[] getOptimalGeneration();
+
+    public String getName() {
+        return this.name;
+    }
 }
+
+
