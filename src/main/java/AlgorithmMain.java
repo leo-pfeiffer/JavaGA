@@ -1,9 +1,9 @@
 import cliDelegate.CliGA;
 import guiDelegate.GuiGA;
-import model.Target.Multimodal;
-import model.Target.Polynomial;
-import model.Target.Quadratic;
-import model.Target.TargetFunction;
+import model.Targets.Multimodal;
+import model.Targets.Polynomial;
+import model.Targets.Quadratic;
+import model.Targets.TargetFunction;
 
 import java.util.HashMap;
 

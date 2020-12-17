@@ -1,9 +1,9 @@
 package guiDelegate;
 
-import model.Chromosome;
-import model.GeneticAlgorithm;
+import model.Solutions.Chromosome;
+import model.Algorithms.GeneticAlgorithm;
 import model.OutputProcessor;
-import model.Target.TargetFunction;
+import model.Targets.TargetFunction;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;

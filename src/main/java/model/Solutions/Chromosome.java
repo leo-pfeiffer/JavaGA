@@ -1,6 +1,6 @@
-package model;
+package model.Solutions;
 
-import model.Target.TargetFunction;
+import model.Targets.TargetFunction;
 
 /** Implements a single chromosome for the GA. */
 public class Chromosome extends Solution {

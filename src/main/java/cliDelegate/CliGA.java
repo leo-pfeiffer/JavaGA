@@ -1,9 +1,9 @@
 package cliDelegate;
 
-import model.Chromosome;
-import model.GeneticAlgorithm;
+import model.Solutions.Chromosome;
+import model.Algorithms.GeneticAlgorithm;
 import model.OutputProcessor;
-import model.Target.TargetFunction;
+import model.Targets.TargetFunction;
 
 import java.util.Arrays;
 import java.util.HashMap;

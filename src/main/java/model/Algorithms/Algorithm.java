@@ -1,6 +1,7 @@
-package model;
+package model.Algorithms;
 
-import model.Target.TargetFunction;
+import model.Solutions.Solution;
+import model.Targets.TargetFunction;
 
 import java.beans.PropertyChangeListener;
 

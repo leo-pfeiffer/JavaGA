@@ -1,6 +1,6 @@
-package model.Target;
+package model.Targets;
 
-import model.Chromosome;
+import model.Solutions.Chromosome;
 
 /** A collection of target functions the GA can be applied to. */
 public abstract class TargetFunction {

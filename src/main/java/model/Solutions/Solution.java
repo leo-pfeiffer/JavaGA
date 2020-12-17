@@ -1,7 +1,7 @@
-package model;
+package model.Solutions;
 
 import com.google.gson.annotations.Expose;
-import model.Target.TargetFunction;
+import model.Targets.TargetFunction;
 
 public abstract class Solution implements Comparable<Solution>{
     /** Genes of the chromosome */

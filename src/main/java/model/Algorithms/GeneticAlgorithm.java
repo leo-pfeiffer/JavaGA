@@ -1,4 +1,4 @@
-package model;
+package model.Algorithms;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import model.Target.TargetFunction;
+import model.Solutions.Chromosome;
+import model.Targets.TargetFunction;
 import org.apache.commons.lang3.ArrayUtils;
 
 

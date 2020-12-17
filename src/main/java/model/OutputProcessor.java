@@ -2,6 +2,7 @@ package model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import model.Solutions.Chromosome;
 
 import javax.swing.JFileChooser;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+// todo make this use the abstract classes instead
 /** model.OutputProcessor handles the output produced by the Genetic Algorithm. */
 public class OutputProcessor {
 
