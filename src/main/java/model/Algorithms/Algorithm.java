@@ -64,6 +64,7 @@ public abstract class Algorithm {
      * @return Array with the Solutions of the last generation*/
     public abstract Solution[] getOptimalGeneration();
 
+
     public String getName() {
         return this.name;
     }
