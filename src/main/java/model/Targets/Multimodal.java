@@ -20,4 +20,11 @@ public class Multimodal extends TargetFunction {
         return stretch * (modes + tilt);
     }
 
+    @Override
+    public String toString() {
+        return "<html>f(x) = 0.1 * <br>" +
+                "((x<sup>4</sup> - 5 * x<sup>2</sup> + y<sup>4</sup> - 5 * y<sup>2</sup>) +<br>" +
+                "(0.5 * x * y + 0.3 * x + 15))</html>";
+    }
+
 }

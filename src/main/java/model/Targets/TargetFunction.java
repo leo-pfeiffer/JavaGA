@@ -2,6 +2,8 @@ package model.Targets;
 
 import model.Solutions.Chromosome;
 
+import java.lang.annotation.Target;
+
 /** A collection of target functions the GA can be applied to. */
 public abstract class TargetFunction {
 
@@ -50,5 +52,6 @@ public abstract class TargetFunction {
 
     public abstract double evaluate(Chromosome chromosome);
 
+    public abstract String toString();
 
 }

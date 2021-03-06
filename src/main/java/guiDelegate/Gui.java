@@ -49,6 +49,7 @@ public class Gui implements PropertyChangeListener {
 
     private JMenuBar menuBar;
 
+    private JTextPane expressionField;
     private JTextArea targetValueField;
     private JTextArea solutionValueField;
 
@@ -62,30 +63,39 @@ public class Gui implements PropertyChangeListener {
         this.registeredAlgos = registeredAlgos;
 
         // setup model (ga)
-//        this.algo = new GeneticAlgorithm();
+        // this.algo = new GeneticAlgorithm();
 
-        mainFrame = new JFrame("GA");
+        // setup the main frame
+        mainFrame = new JFrame("OptiVis");
         mainFrame.setMinimumSize(new Dimension(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT));
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);
 
+        // setup menu actions
         createActions();
 
+        // initialise options bar
         optionsBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         outputBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // initialise info box
         functionInfoBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
+        // initialise menu bar
         menuBar = new JMenuBar();
 
+        // initialise the graph canvas
         List<Double> startGraphValues = new ArrayList<>();
         startGraphValues.add(0d);
         graphPanel = new GraphPanel(startGraphValues);
         graphPanel.setPreferredSize(new Dimension(GRAPH_WIDTH, FRAME_HEIGHT));
 
+        // setup all components
         setupComponents();
 
+        // add the observer
         this.algo.addObserver(this);
     }
 
@@ -105,7 +115,7 @@ public class Gui implements PropertyChangeListener {
         algoSelector = new JComboBox<>(dataAlgoSelector);
 
         JPanel algoSelectorPanel = new JPanel();
-        GridLayout gl = new GridLayout(1,2); // 1 row, dimensions columns
+        GridLayout gl = new GridLayout(1,2); // 1 row, 2 columns
         algoSelectorPanel.setLayout(gl);
         algoSelectorPanel.add(new JLabel("Algorithm:"));
         algoSelectorPanel.add(algoSelector);
@@ -140,12 +150,20 @@ public class Gui implements PropertyChangeListener {
     private void setupInfoBox() {
 
         infoBar = new JPanel();
-        GridLayout gl = new GridLayout(2, 1); // 1 row, dimensions columns
+        GridLayout gl = new GridLayout(2, 1);
         infoBar.setLayout(gl);
 
         // Function info box
         functionInfoBox.setBorder(BorderFactory.createTitledBorder(algorithmOptionsBar.getSelectedTarget()));
-        // todo add info about the function here
+        expressionField = new JTextPane();
+        expressionField.setVisible(true);
+        expressionField.setContentType("text/html");
+        expressionField.setText("<html>f(x) = ...</html>");
+        expressionField.setEditable(false);
+        expressionField.setBackground(null);
+        expressionField.revalidate();
+
+        functionInfoBox.add(expressionField);
 
         infoBar.add(functionInfoBox);
 
@@ -204,7 +222,7 @@ public class Gui implements PropertyChangeListener {
     /** Create all actions. */
     public void createActions() {
 
-        // Save the drawing
+        // Save as a JSON file
         saveAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -269,6 +287,11 @@ public class Gui implements PropertyChangeListener {
         }
     }
 
+    public void displayInfoBox() {
+        expressionField.setText(this.algo.getTarget().toString());
+        expressionField.revalidate();
+    }
+
     public void displayGraph(List<Double> fitnessValues) {
         graphPanel.setScores(fitnessValues);
     }
@@ -284,6 +307,7 @@ public class Gui implements PropertyChangeListener {
             solutionTextBuilder.append(df.format(p));
             solutionTextBuilder.append("\n");
         }
+
         String solutionText = solutionTextBuilder.substring(0, solutionTextBuilder.length()-2);
         solutionValueField.setRows(solution.length);
         solutionValueField.setText(solutionText);

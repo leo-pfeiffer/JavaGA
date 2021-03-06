@@ -144,6 +144,8 @@ public class GeneticAlgorithmOptionsBar extends AlgorithmOptionsBar {
             int maxGen = Integer.parseInt(maxGenField.getText());
             ((GeneticAlgorithm) gui.getAlgo()).setMaxGen(maxGen);
 
+            gui.displayInfoBox();
+
             // Run algorithm
             gui.getAlgo().runAlgorithm();
 

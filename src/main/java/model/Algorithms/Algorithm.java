@@ -33,6 +33,12 @@ public abstract class Algorithm {
         this.target = target;
     }
 
+    /** Get the target associated with the current algo instance.
+     * @return TargetFunction*/
+    public TargetFunction getTarget() {
+        return this.target;
+    }
+
     /** Setter method for the starting values.
      * @param startingValues The starting values. */
     public void setStartingValues(double[] startingValues){

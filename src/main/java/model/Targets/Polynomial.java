@@ -2,6 +2,8 @@ package model.Targets;
 
 import model.Solutions.Chromosome;
 
+import java.util.Arrays;
+
 public class Polynomial extends TargetFunction {
 
     public Polynomial() {
@@ -27,4 +29,39 @@ public class Polynomial extends TargetFunction {
 
         return y;
     }
+
+    @Override
+    public String toString() {
+
+        StringBuilder expr = new StringBuilder("<html>f(x) = <br>");
+        double[] params = getParameters();
+
+        for (int i = 0; i < params.length; i++) {
+
+            if (params[i] < 0) {
+                expr.append('(');
+            }
+            expr.append(params[i]);
+
+            if (params[i] < 0) {
+                expr.append(')');
+            }
+
+            expr.append(" * x<sup>");
+            expr.append(params.length - i > 1 ? params.length - i : "");
+            expr.append("</sup>");
+
+            if (i < params.length - 1) {
+                expr.append(" + ");
+            }
+
+            expr.append("<br>");
+        }
+
+        expr.append("</html>");
+
+        return String.valueOf(expr);
+    }
+
+
 }
